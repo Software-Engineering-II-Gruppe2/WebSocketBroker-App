@@ -4,10 +4,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    jacoco
+    id("jacoco")
     id("org.sonarqube") version "5.1.0.4882"
+    id("com.google.gms.google-services")
 }
-
 
 sonar {
     properties {
@@ -18,9 +18,50 @@ sonar {
     }
 }
 
+android {
+    namespace = "com.example.myapplication"
+    compileSdk = 35
 
+    defaultConfig {
+        applicationId = "com.example.myapplication"
+        minSdk = 30
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0"
 
-tasks.withType<Test> {
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+
+    buildFeatures {
+        compose = true
+        viewBinding = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.3"
+    }
+}
+
+tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
@@ -60,73 +101,55 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     )
 }
 
-
-android {
-    namespace = "com.example.myapplication"
-    compileSdk = 35
-
-
-    defaultConfig {
-        applicationId = "com.example.myapplication"
-        minSdk = 30
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-    buildFeatures {
-        compose = true
-        viewBinding = true
-    }
-
-}
-tasks.withType<Test>().configureEach {
-    useJUnitPlatform()
-}
-
-
 dependencies {
+    // Firebase
+    implementation(libs.firebase.auth.ktx)
+    implementation(platform(libs.firebase.bom))
 
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    // WebSockets
     implementation(libs.krossbow.websocket.okhttp)
     implementation(libs.krossbow.stomp.core)
     implementation(libs.krossbow.websocket.builtin)
+
+    // AndroidX Core & Lifecycle
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+
+    // Jetpack Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
+
+    // Debugging
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Unit Testing
     testImplementation(libs.junit)
-    testImplementation ("org.junit.jupiter:junit-jupiter-api:5.9.3")
-    testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine:5.9.3")
-    testImplementation ("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.3")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.mockito:mockito-core:5.7.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.7.0")
+    testImplementation(libs.mockk)
+
+    // Android Testing
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+
+    androidTestImplementation(libs.mockito.core)
+    androidTestImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.androidx.navigation.testing)
 }
