@@ -1,5 +1,6 @@
 [versions]
 agp = "8.9.0"
+androidxEspressoCore = "3.5.0"
 firebaseAuthKtx = "22.1.1"
 firebaseBom = "33.11.0"
 junitJupiterApi = "5.7.0"
@@ -18,25 +19,36 @@ lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.8.0"
 composeBom = "2024.09.00"
 constraintlayout = "2.2.1"
+material3 = "1.0.0"
 mockitoAndroid = "4.3.1"
+mockitoAndroidVersion = "4.5.1"
 mockitoCore = "4.0.0"
 mockitoCoreVersion = "4.3.1"
 mockitoKotlin = "4.0.0"
 mockitoKotlinVersion = "4.3.1"
 mockitoMockitoCore = "4.8.0"
+mockitoMockitoCoreVersion = "4.2.0"
+mockitoMockitoKotlin = "4.2.0"
 mockk = "1.12.0"
 navigationCompose = "2.7.6"
+navigationTesting = "2.5.0"
 rules = "1.5.0"
 uiTestJunit4 = "1.5.3"
 uiTestJunit4Android = "1.7.8"
 espressoCoreVersion = "3.6.1"
+uiTestJunit4Version = "1.4.0"
 uiTestManifest = "1.7.8"
+uiTestManifestVersion = "1.4.0"
 uiTooling = "1.5.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-espresso-core-v350 = { module = "androidx.test.espresso:espresso-core", version.ref = "androidxEspressoCore" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigationTesting" }
 androidx-rules = { module = "androidx.test:rules", version.ref = "rules" }
+androidx-ui-test-junit4-v140 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4Version" }
+androidx-ui-test-manifest-v140 = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "uiTestManifestVersion" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -60,13 +72,17 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 krossbow-stomp-core = { module = "org.hildan.krossbow:krossbow-stomp-core", version.ref = "krossbowStompCore" }
 krossbow-websocket-builtin = { module = "org.hildan.krossbow:krossbow-websocket-builtin", version.ref = "krossbowWebsocketBuiltin" }
 krossbow-websocket-okhttp = { module = "org.hildan.krossbow:krossbow-websocket-okhttp", version.ref = "krossbowWebsocketOkhttp" }
+material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
+mockito-android-v451 = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroidVersion" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
+mockito-core-v420 = { module = "org.mockito:mockito-core", version.ref = "mockitoMockitoCoreVersion" }
 mockito-core-v431 = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }
 mockito-core-v480 = { module = "org.mockito:mockito-core", version.ref = "mockitoMockitoCore" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 androidx-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCoreVersion" }
+mockito-kotlin-v420 = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoMockitoKotlin" }
 mockito-kotlin-v431 = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlinVersion" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4" }

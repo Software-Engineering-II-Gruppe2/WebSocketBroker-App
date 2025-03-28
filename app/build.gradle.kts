@@ -89,5 +89,14 @@ dependencies {
 
     testImplementation(libs.mockk)
     androidTestImplementation(libs.mockk)
+    androidTestImplementation(libs.androidx.ui.test.junit4.v140)
+    androidTestImplementation(libs.androidx.ui.test.manifest.v140)
+    androidTestImplementation(libs.material3)
+    testImplementation(libs.junit)
+
+    androidTestImplementation(libs.mockito.core)
+    androidTestImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.mockito.android.v451)
+    androidTestImplementation(libs.androidx.navigation.testing)
 
 }
