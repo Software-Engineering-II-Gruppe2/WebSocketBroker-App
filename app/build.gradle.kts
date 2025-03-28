@@ -86,4 +86,8 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core) // Espresso for UI tests
     androidTestImplementation(platform(libs.androidx.compose.bom)) // Compose BOM for UI tests
     androidTestImplementation(libs.androidx.ui.test.junit4) // Compose testing API
+
+    testImplementation(libs.mockk)
+    androidTestImplementation(libs.mockk)
+
 }
