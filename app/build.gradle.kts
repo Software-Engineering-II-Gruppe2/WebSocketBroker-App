@@ -14,8 +14,7 @@ sonar {
         property("sonar.projectKey", "Software-Engineering-II-Gruppe2_WebSocketBroker-App")
         property("sonar.organization", "software-engineering-ii-gruppe2")
         property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.testExecutionReportPaths", "${layout.buildDirectory.asFile}/test-results/testDebugUnitTest/TEST-*.xml")
-        property("sonar.testExecutionReportPaths", "${layout.buildDirectory.asFile}/outputs/androidTest-results/connected/debug/TEST-*.xml")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
     }
 }
 
