@@ -1,9 +1,12 @@
+import org.gradle.testing.jacoco.tasks.JacocoReport
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("org.sonarqube") version "5.1.0.4882"
     id("com.google.gms.google-services")
+    id("jacoco")
 }
 
 sonar {
@@ -11,6 +14,7 @@ sonar {
         property("sonar.projectKey", "Software-Engineering-II-Gruppe2_WebSocketBroker-App")
         property("sonar.organization", "software-engineering-ii-gruppe2")
         property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
     }
 }
 
@@ -29,6 +33,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -37,6 +45,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -53,7 +62,33 @@ android {
     }
 }
 
-dependencies {
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val fileFilter = listOf(
+        "**/R.class", "**/R\$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*", "android/**/*.*"
+    )
+
+    val debugTree = fileTree(layout.buildDirectory.get().dir("intermediates/javac/debug")) {
+        exclude(fileFilter)
+    }
+    val kotlinDebugTree = fileTree(layout.buildDirectory.get().dir("tmp/kotlin-classes/debug")) {
+        exclude(fileFilter)
+    }
+    val executionDataFile = layout.buildDirectory.file("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec").get().asFile
+
+    sourceDirectories.setFrom(files("src/main/java"))
+    classDirectories.setFrom(files(debugTree, kotlinDebugTree))
+    executionData.setFrom(executionDataFile)
+}
+
+
+    dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.coroutines.play.services)
@@ -72,31 +107,30 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.androidx.ui.test.junit4.android)
     implementation(libs.espresso.core)
-    // Debug dependencies for UI tools
+
+    // Debugging & UI Testing
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    debugImplementation(libs.ui.tooling) // For Compose tool preview and debugging
-    // Compose dependencies
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
 
-    // Android Testing Dependencies
-    androidTestImplementation(libs.androidx.junit) // JUnit for Android tests
-    androidTestImplementation(libs.androidx.espresso.core) // Espresso for UI tests
-    androidTestImplementation(platform(libs.androidx.compose.bom)) // Compose BOM for UI tests
-    androidTestImplementation(libs.androidx.ui.test.junit4) // Compose testing API
-
+    // Unit Testing
     testImplementation(libs.mockk)
+    testImplementation(libs.junit)
+
+    // Android Instrumentation Tests
     androidTestImplementation(libs.mockk)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.androidx.ui.test.junit4.v140)
     androidTestImplementation(libs.androidx.ui.test.manifest.v140)
     androidTestImplementation(libs.material3)
-    testImplementation(libs.junit)
-
     androidTestImplementation(libs.mockito.core)
     androidTestImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.mockito.android.v451)
     androidTestImplementation(libs.androidx.navigation.testing)
-
 }
