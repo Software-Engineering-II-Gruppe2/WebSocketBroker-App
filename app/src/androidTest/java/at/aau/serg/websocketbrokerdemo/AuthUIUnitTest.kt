@@ -6,6 +6,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.navigation.compose.rememberNavController
+import at.aau.serg.websocketbrokerdemo.ui.LoginScreen
+import at.aau.serg.websocketbrokerdemo.ui.RegisterScreen
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test

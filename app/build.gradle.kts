@@ -143,7 +143,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-
+    testImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.mockito.core)
     androidTestImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.androidx.navigation.testing)
