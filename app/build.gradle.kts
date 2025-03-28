@@ -62,8 +62,8 @@ android {
     }
 }
 
-tasks.register<JacocoReport>("jacocoFullReport") {
-    dependsOn("testDebugUnitTest", "connectedDebugAndroidTest")
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
 
     reports {
         xml.required.set(true)
@@ -80,16 +80,12 @@ tasks.register<JacocoReport>("jacocoFullReport") {
     val kotlinDebugTree = fileTree(layout.buildDirectory.get().dir("tmp/kotlin-classes/debug")) {
         exclude(fileFilter)
     }
-
-    val unitTestExec = layout.buildDirectory.file("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec").get().asFile
-    val androidTestExec = layout.buildDirectory.file("outputs/code_coverage/debugAndroidTest/connected/coverage.ec").get().asFile
+    val executionDataFile = layout.buildDirectory.file("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec").get().asFile
 
     sourceDirectories.setFrom(files("src/main/java"))
     classDirectories.setFrom(files(debugTree, kotlinDebugTree))
-    executionData.setFrom(files(unitTestExec, androidTestExec)) // Beides zusammenführen
+    executionData.setFrom(executionDataFile)
 }
-
-
 
 
     dependencies {
