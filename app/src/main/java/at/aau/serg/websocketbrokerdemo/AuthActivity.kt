@@ -1,7 +1,6 @@
 package at.aau.serg.websocketbrokerdemo
 
-import android.app.Activity
-import android.content.Context
+
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,11 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.navigation.compose.*
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.tasks.await
-import at.aau.serg.websocketbrokerdemo.MainActivity
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
