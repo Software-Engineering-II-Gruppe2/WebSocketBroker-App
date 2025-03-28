@@ -145,7 +145,7 @@ dependencies {
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
     testImplementation("org.mockito:mockito-core:5.10.0")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation(libs.mockito.kotlin)
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     // Android Instrumentation Tests
