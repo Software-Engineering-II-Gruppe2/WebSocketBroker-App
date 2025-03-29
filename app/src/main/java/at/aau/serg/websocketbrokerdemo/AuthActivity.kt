@@ -28,7 +28,13 @@ class AuthActivity : ComponentActivity() {
             }
         } else {
             setContent {
-                AuthNavigation()
+                var showStartScreen by remember { mutableStateOf(true) }
+
+                if (showStartScreen) {
+                    StartScreen(onEnterClick = { showStartScreen = false })
+                } else {
+                    AuthNavigation()
+                }
             }
         }
     }
