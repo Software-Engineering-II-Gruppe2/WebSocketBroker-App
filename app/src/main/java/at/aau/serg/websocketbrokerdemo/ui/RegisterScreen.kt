@@ -61,7 +61,7 @@ fun RegisterScreen(navController: NavController) {
     }
 }
 
-private fun registerUser(auth: FirebaseAuth, email: String, password: String, context: Context, setErrorMessage: (String) -> Unit) {
+internal fun registerUser(auth: FirebaseAuth, email: String, password: String, context: Context, setErrorMessage: (String) -> Unit) {
     auth.createUserWithEmailAndPassword(email, password)
         .addOnSuccessListener {
             // Wenn die Registrierung erfolgreich ist, gehe zur MainActivity

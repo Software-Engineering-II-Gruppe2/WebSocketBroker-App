@@ -63,7 +63,7 @@ fun LoginScreen(navController: NavController) {
 
 
 
-private fun loginUser(auth: FirebaseAuth, email: String, password: String, context: Context, setErrorMessage: (String) -> Unit) {
+internal fun loginUser(auth: FirebaseAuth, email: String, password: String, context: Context, setErrorMessage: (String) -> Unit) {
     auth.signInWithEmailAndPassword(email, password)
         .addOnSuccessListener {
             context.startActivity(Intent(context, MainActivity::class.java))
