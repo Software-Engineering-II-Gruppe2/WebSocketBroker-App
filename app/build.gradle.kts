@@ -11,7 +11,7 @@ plugins {
 
 android {
     namespace = "com.example.myapplication"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.myapplication"
@@ -120,6 +120,7 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
+    implementation("com.google.code.gson:gson:2.10.1")
     implementation(libs.krossbow.websocket.okhttp)
     implementation(libs.krossbow.stomp.core)
     implementation(libs.krossbow.websocket.builtin)
@@ -133,6 +134,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.core.ktx)
+    implementation(libs.androidx.ui.test.junit4.android)
     testImplementation(libs.junit)
     testImplementation (libs.junit.jupiter.api)
     testRuntimeOnly (libs.junit.jupiter.engine)
@@ -145,6 +147,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("androidx.navigation:navigation-compose:2.5.3")
-    implementation("com.google.firebase:firebase-auth-ktx:21.1.0")
+    implementation("androidx.navigation:navigation-compose:2.8.9")
+    implementation("com.google.firebase:firebase-auth-ktx:23.2.0")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.4.0")
+    debugImplementation ("androidx.compose.ui:ui-tooling:1.4.0")
 }
