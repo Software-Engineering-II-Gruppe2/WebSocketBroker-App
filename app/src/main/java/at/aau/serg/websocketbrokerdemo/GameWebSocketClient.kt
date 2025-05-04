@@ -31,6 +31,7 @@ class GameWebSocketClient(
     private val onTaxPayment: (playerName: String, amount: Int, taxType: String) -> Unit,
 ) {
     private val client = OkHttpClient()
+
     // Use a nullable WebSocket so we can check if it's already connected
     private var webSocket: WebSocket? = null
     private val gson = Gson()
@@ -62,9 +63,9 @@ class GameWebSocketClient(
 
     private fun sendInitMessage() {
         CoroutineScope(coroutineDispatcher).launch {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        currentUser?.uid?.let { userId ->
-            CoroutineScope(Dispatchers.IO).launch {
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            currentUser?.uid?.let { userId ->
+                CoroutineScope(Dispatchers.IO).launch {
                     val profile = FirestoreManager.getUserProfile(userId)
                     val name = profile?.name ?: "Unknown"
                     val initMessage = """{
@@ -93,11 +94,13 @@ class GameWebSocketClient(
             try {
                 val taxMessage = gson.fromJson(text, TaxPaymentMessage::class.java)
                 if (taxMessage.type == "TAX_PAYMENT") {
-                    val playerName = players.find { it.id == taxMessage.playerId }?.name ?: "Unknown Player"
+                    val playerName =
+                        players.find { it.id == taxMessage.playerId }?.name ?: "Unknown Player"
                     onTaxPayment(playerName, taxMessage.amount, taxMessage.taxType)
                     return
                 }
-            } catch (_: Exception) { /* not a tax payment message */ }
+            } catch (_: Exception) { /* not a tax payment message */
+            }
 
             // Check for "passed GO" message
             if (text.contains("passed GO and collected")) {
@@ -140,7 +143,8 @@ class GameWebSocketClient(
                     onDiceRolled(obj.playerId, obj.value)
                     return  // don't fall through to the generic log handler
                 }
-            } catch (_: Exception) { /* not a dice‐roll */ }
+            } catch (_: Exception) { /* not a dice‐roll */
+            }
 
             try {
                 val chatMessage = gson.fromJson(text, ChatMessage::class.java)
@@ -149,7 +153,8 @@ class GameWebSocketClient(
                     onChatMessageReceived(chatMessage.playerId, chatMessage.message)
                     return
                 }
-            } catch (_: Exception) { /* not a chat-message */ }
+            } catch (_: Exception) { /* not a chat-message */
+            }
 
             // Always call the general message handler
             onMessageReceived(text)
@@ -244,4 +249,14 @@ class GameWebSocketClient(
         Log.d("WebSocket", "Sent tax payment message: $json")
     }
 
+    fun sendGiveUpMessage(userId: String) {
+        val message = """
+        {
+            "type": "GIVE_UP",
+            "userId": "$userId"
+        }
+    """.trimIndent()
+
+        webSocket?.send(message)
+    }
 }
