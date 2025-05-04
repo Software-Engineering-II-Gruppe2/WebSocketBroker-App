@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
@@ -65,8 +66,8 @@ fun PlayboardScreen(
     localPlayerId: String,
     onRollDice: () -> Unit,
     onBackToLobby: () -> Unit,
-    diceResult:     Int?,
-    dicePlayerId:   String?,
+    diceResult: Int?,
+    dicePlayerId: String?,
     webSocketClient: GameWebSocketClient,
     chatMessages: List<ChatEntry>,
     showPassedGoAlert: Boolean,
@@ -74,11 +75,18 @@ fun PlayboardScreen(
     showTaxPaymentAlert: Boolean,
     taxPaymentPlayerName: String,
     taxPaymentAmount: Int,
-    taxPaymentType: String
+    taxPaymentType: String,
+    onGiveUp: () -> Unit = {} // NEU
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
-    val properties = remember { mutableStateListOf<Property>().apply { addAll(propertyViewModel.getProperties(context)) } }
+    val properties = remember {
+        mutableStateListOf<Property>().apply {
+            addAll(
+                propertyViewModel.getProperties(context)
+            )
+        }
+    }
     val isMyTurn = currentPlayerId == localPlayerId
 
     var selectedProperty by remember { mutableStateOf<Property?>(null) }
@@ -87,7 +95,7 @@ fun PlayboardScreen(
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
     var showPropertyCard by remember { mutableStateOf(false) }
     var manualDiceValue by remember { mutableStateOf("") }
-    var chatOpen by remember{ mutableStateOf(false)}
+    var chatOpen by remember { mutableStateOf(false) }
     var chatInput by remember { mutableStateOf("") }
     val nameColors = listOf(
         Color(0xFFE57373), // Rot
@@ -108,7 +116,7 @@ fun PlayboardScreen(
 
         if (newPosition != null && newPosition != lastPlayerPosition) {
             lastPlayerPosition = newPosition
-            
+
             // Check for tax squares
             when (newPosition) {
                 4 -> { // Einkommensteuer
@@ -121,6 +129,7 @@ fun PlayboardScreen(
                         taxType = "EINKOMMENSTEUER"
                     )
                 }
+
                 38 -> { // Zusatzsteuer
                     if (showPassedGoAlert) {
                         delay(3000) // Wait for GO alert to finish
@@ -132,7 +141,7 @@ fun PlayboardScreen(
                     )
                 }
             }
-            
+
             val landedProperty = properties.find { it.position == newPosition }
             if (landedProperty != null) {
                 // If player passed GO, delay showing property card
@@ -199,7 +208,7 @@ fun PlayboardScreen(
                 color = Color(0xFF3FAF3F),
                 onClick = onRollDice,
                 diceValue = diceResult,
-                enabled   = isMyTurn
+                enabled = isMyTurn
             )
 
             // Manual Dice Roll Section
@@ -283,6 +292,19 @@ fun PlayboardScreen(
             ) {
                 Text("Back to Lobby", fontSize = 18.sp)
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = onGiveUp,
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .testTag("giveUpButton")
+            ) {
+                Text("Give Up", fontSize = 18.sp, color = Color.White)
+            }
         }
         // Popup für Grundstück
         if (selectedProperty != null) {
@@ -363,7 +385,11 @@ fun PlayboardScreen(
                                     openedByClick = false
                                     canBuy = false
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc))
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        0xFF0074cc
+                                    )
+                                )
                             ) {
                                 Text("Buy")
                             }
@@ -687,7 +713,11 @@ fun PropertySetCard(
     ) {}
 }
 
-fun checkCompleteSet(colorSet: PropertyColor, owned: List<Property>, allProperties: List<Property>): Boolean {
+fun checkCompleteSet(
+    colorSet: PropertyColor,
+    owned: List<Property>,
+    allProperties: List<Property>
+): Boolean {
     val totalInSet = allProperties.count { getColorForPosition(it.position) == colorSet }
     return owned.size == totalInSet
 }
@@ -703,8 +733,8 @@ fun getColorForSet(colorSet: PropertyColor): Color {
         PropertyColor.GREEN -> Color.Green
         PropertyColor.DARK_BLUE -> Color(0xFF00008B)
         PropertyColor.RAILROAD -> Color(0xFF8B4513)
-        PropertyColor.UTILITY -> Color (0xFF20B2AA)
-        PropertyColor.NONE -> Color (0xFFA9A9A9)
+        PropertyColor.UTILITY -> Color(0xFF20B2AA)
+        PropertyColor.NONE -> Color(0xFFA9A9A9)
     }
 }
 
@@ -822,13 +852,16 @@ fun DiceRollingButton(
         targetValue = rotateAngle,
         animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
     )
-    val scale by animateFloatAsState(if (isPressed && enabled) 1.1f else 1f, animationSpec = tween(150))
+    val scale by animateFloatAsState(
+        if (isPressed && enabled) 1.1f else 1f,
+        animationSpec = tween(150)
+    )
     val buttonColor by animateColorAsState(
         targetValue = when {
-            !enabled      -> Color.Gray
-            isPressed     -> color.copy(alpha = 0.7f)
-            else          -> color
-            },
+            !enabled -> Color.Gray
+            isPressed -> color.copy(alpha = 0.7f)
+            else -> color
+        },
         animationSpec = tween(durationMillis = 150)
     )
 
@@ -838,9 +871,12 @@ fun DiceRollingButton(
             isPressed = true
             rotateAngle += 720f
             onClick()
-            },
+        },
         enabled = enabled,
-        modifier = Modifier.height(56.dp).scale(scale).rotate(rotation),
+        modifier = Modifier
+            .height(56.dp)
+            .scale(scale)
+            .rotate(rotation),
         shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
     ) {
