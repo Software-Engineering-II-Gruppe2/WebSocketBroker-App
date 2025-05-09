@@ -7,6 +7,7 @@ import at.aau.serg.websocketbrokerdemo.data.DiceRollMessage
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.data.TaxPaymentMessage
+import at.aau.serg.websocketbrokerdemo.data.SoundEffectMessage
 import com.google.common.reflect.TypeToken
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
@@ -151,6 +152,13 @@ class GameWebSocketClient(
                 }
             } catch (_: Exception) { /* not a chat-message */ }
 
+            try {
+                val soundMessage = gson.fromJson(text, SoundEffectMessage::class.java)
+                if (soundMessage.type == "PLAY_SOUND" && soundMessage.sound == "high_payment.mp3") {
+                    playSoundEffect(context, soundMessage.sound)
+                    return
+                }
+            } catch (_: Exception) { /* not a sound-effect message */ }
             // Always call the general message handler
             onMessageReceived(text)
         }
@@ -243,5 +251,18 @@ class GameWebSocketClient(
         webSocket?.send(json)
         Log.d("WebSocket", "Sent tax payment message: $json")
     }
+    private fun playSoundEffect(context: Context, fileName: String) {
+        try {
+            val afd = context.assets.openFd("sounds/$fileName")  // Datei liegt in assets/sounds/
+            val mediaPlayer = android.media.MediaPlayer()
+            mediaPlayer.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+            mediaPlayer.prepare()
+            mediaPlayer.start()
+        } catch (e: Exception) {
+            Log.e("SoundEffect", "Error playing sound: $e")
+        }
+        playSoundEffect(context, "bell-notification-337658.mp3")
+    }
+
 
 }
