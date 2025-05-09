@@ -67,6 +67,12 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        LaunchedEffect(userId) {
+            if (userId != null) {
+                localPlayerId = userId
+            }
+        }
+
         // Show tax payment alert for 3 seconds (only if not triggered by passing GO)
         LaunchedEffect(showTaxPaymentAlert) {
             if (showTaxPaymentAlert && !showPassedGoAlert) {
@@ -105,10 +111,9 @@ class MainActivity : ComponentActivity() {
                     // (you already had logic for matching firebase ID → session-ID)
                     currentGamePlayerId = players.find { it.id == userId }?.id ?: userId
                 },
-                onPlayerTurn = { sessionId ->
-                    // here's where we grab "my" session-id from the server
-                    localPlayerId = sessionId
-                    Log.d("WebSocket", "It's now YOUR turn; session ID = $sessionId")
+                onPlayerTurn = { currentTurnPlayerId ->
+                    currentGamePlayerId = currentTurnPlayerId
+                    Log.d("WebSocket", "Current turn belongs to: $currentTurnPlayerId")
                 },
                 onChatMessageReceived = { senderId, text ->
                     val senderName = playerMoneyList.find { it.id == senderId }?.name ?: "Unknown"
