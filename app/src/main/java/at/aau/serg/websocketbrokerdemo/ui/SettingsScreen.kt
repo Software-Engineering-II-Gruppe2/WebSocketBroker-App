@@ -91,4 +91,7 @@ fun saveBrightnessSetting(brightness: Float) {
         println("Benutzer ist nicht angemeldet")
     }
 }
+fun formatBrightness(brightness: Float): String {
+    return "Helligkeit: ${(brightness * 100).toInt()}%"
+}
 

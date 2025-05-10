@@ -23,8 +23,9 @@ import at.aau.serg.websocketbrokerdemo.ui.LobbyScreen
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
+import at.aau.serg.websocketbrokerdemo.ui.SettingsScreen
+import at.aau.serg.websocketbrokerdemo.ui.SoundSelectionScreen
 import at.aau.serg.websocketbrokerdemo.ui.UserProfileScreen
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
@@ -33,6 +34,7 @@ import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
 import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
 import kotlinx.coroutines.delay
 
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -193,7 +195,11 @@ class MainActivity : ComponentActivity() {
                     onProfileClick = { navController.navigate("profile") },
                     onJoinGame = { navController.navigate("playerInfo") },
                     onStatisticsClick = { navController.navigate("statistics") },
-                    onLeaderboardClick = { navController.navigate("leaderboard") }
+                    onLeaderboardClick = { navController.navigate("leaderboard") },
+
+                    onOpenSettings ={navController.navigate("settings")},
+                    onOpenSoundSelection ={navController.navigate("soundSelection")}
+
                 )
             }
             composable("profile") {
@@ -255,6 +261,12 @@ class MainActivity : ComponentActivity() {
                 LeaderboardScreen(
                     onBack = { navController.popBackStack() }
                 )
+            }
+            composable("settings"){
+                SettingsScreen()
+            }
+            composable("soundSelection"){
+                SoundSelectionScreen()
             }
         }
     }

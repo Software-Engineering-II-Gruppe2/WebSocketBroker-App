@@ -32,6 +32,8 @@ class LobbyScreenTest {
                 onProfileClick = {},
                 onStatisticsClick = {},
                 onLeaderboardClick = {},
+                onOpenSettings = {},
+                onOpenSoundSelection = {},
                 onJoinGame = {}
             )
         }
@@ -60,6 +62,8 @@ class LobbyScreenTest {
                 onProfileClick = {},
                 onStatisticsClick = {},
                 onLeaderboardClick = {},
+                onOpenSettings = {},
+                onOpenSoundSelection = {},
                 onJoinGame = {}
             )
         }
@@ -90,6 +94,8 @@ class LobbyScreenTest {
                 onProfileClick = {},
                 onStatisticsClick = {},
                 onLeaderboardClick = {},
+                onOpenSettings = {},
+                onOpenSoundSelection = {},
                 onJoinGame = {}
             )
         }

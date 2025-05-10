@@ -56,6 +56,8 @@ fun LobbyScreen(
     onStatisticsClick: () -> Unit,
     onLeaderboardClick: () -> Unit,
     onJoinGame: () -> Unit,
+    onOpenSettings:() -> Unit,
+    onOpenSoundSelection:() -> Unit,
 ) {
     var showWifiIcon by remember { mutableStateOf(false) }
     var showDisconnectIcon by remember { mutableStateOf(false) }
@@ -118,6 +120,8 @@ fun LobbyScreen(
                 AnimatedButton("Join Game", Color(0xFF9C27B0)) {
                     onJoinGame()
                 }
+                AnimatedButton("⚙️ Settings", Color(0xFF4CAF50), onOpenSettings)
+                AnimatedButton("🎵 Sound", Color(0xFF3F51B5), onOpenSoundSelection)
             }
 
             // WiFi Icon Animation (Connect)
