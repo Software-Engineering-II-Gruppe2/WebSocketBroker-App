@@ -29,6 +29,7 @@ class PassingGoTest {
         onPlayerTurn = { /* No-op for testing */ },
         onPlayerPassedGo = { /* No-op for testing */ },
         coroutineDispatcher = Dispatchers.IO,
+        onCardDrawn = {_,_,_ ->},
         onChatMessageReceived = { _, _ -> },
         onTaxPayment = { _, _, _ -> /* No-op for testing */ }
     )
@@ -183,4 +184,4 @@ class PassingGoTest {
         // Verify player's money is updated (1500 + 200)
         composeTestRule.onNodeWithText("EUR ${initialMoney + 200}").assertExists()
     }
-} 
+}

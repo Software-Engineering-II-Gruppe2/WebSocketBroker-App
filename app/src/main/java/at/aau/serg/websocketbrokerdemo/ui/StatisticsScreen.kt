@@ -30,6 +30,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType.Companion.PrimaryNotEditable
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -58,6 +59,10 @@ import at.aau.serg.websocketbrokerdemo.data.GameData
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
+import at.aau.serg.websocketbrokerdemo.logic.Metric
+import at.aau.serg.websocketbrokerdemo.logic.ChartType
+import at.aau.serg.websocketbrokerdemo.logic.calculateChartData
+import at.aau.serg.websocketbrokerdemo.logic.filterByDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,28 +135,6 @@ fun StatisticsScreen(userId: String?, onBack: () -> Unit) {
     }
 }
 
-internal fun calculateChartData(
-    games: List<GameData>,
-    filter: String,
-    metric: Metric
-): Pair<Map<String, Float>, Float> {
-    val filtered = games.filterByDate(filter)
-    val processed = when (metric) {
-        Metric.WINS -> filtered.cumulativeWins()
-        else -> filtered.groupByTime(filter, metric)
-    }
-    val max = processed.values.maxOrNull() ?: 1f
-    return Pair(processed, max)
-}
-
-private enum class ChartType { BAR, LINE }
-
-internal enum class Metric(val displayName: String) {
-    WINS("Wins"),
-    LEVEL("Level"),
-    MONEY("Money"),
-    DURATION("Duration")
-}
 
 @Composable
 private fun ChartContainer(
@@ -292,7 +275,8 @@ private fun MetricDropdown(currentMetric: Metric, onMetricSelected: (Metric) -> 
             value = currentMetric.displayName,
             onValueChange = {},
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor().width(100.dp)
+            modifier = Modifier.menuAnchor(type = PrimaryNotEditable , enabled = true)
+                .width(100.dp)
         )
 
         ExposedDropdownMenu(
@@ -331,7 +315,8 @@ private fun FilterDropdown(currentFilter: String, onFilterSelected: (String) -> 
             value = filters[currentFilter] ?: "",
             onValueChange = {},
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor().width(120.dp)
+            modifier = Modifier.menuAnchor(type = PrimaryNotEditable , enabled = true)
+                .width(120.dp)
         )
 
         ExposedDropdownMenu(
@@ -414,45 +399,3 @@ private fun StatRow(label: String, value: String, highlight: Boolean, color: Col
     }
 }
 
-internal fun List<GameData>.filterByDate(filter: String): List<GameData> {
-    return this.filter {
-        val timestamp = it.timestamp.toDate().time
-        when (filter) {
-            "week" -> System.currentTimeMillis() - timestamp < 604_800_000
-            "month" -> System.currentTimeMillis() - timestamp < 2_592_000_000
-            else -> true
-        }
-    }.sortedBy { it.timestamp.toDate().time }
-}
-
-internal fun List<GameData>.cumulativeWins(): Map<String, Float> {
-    var cumulative = 0
-    return this.associate { game ->
-        cumulative += if (game.won) 1 else 0
-        Pair(game.getTimeLabel(), cumulative.toFloat())
-    }
-}
-
-internal fun List<GameData>.groupByTime(filter: String, metric: Metric): Map<String, Float> {
-    val format = when (filter) {
-        "week" -> SimpleDateFormat("EEE", Locale.getDefault())
-        "month" -> SimpleDateFormat("dd", Locale.getDefault())
-        else -> SimpleDateFormat("MMM", Locale.getDefault())
-    }
-
-    return groupBy {
-        format.format(it.timestamp.toDate())
-    }.mapValues { entry ->
-        when (metric) {
-            Metric.MONEY -> entry.value.sumOf { it.endMoney }.toFloat()
-            Metric.LEVEL -> entry.value.sumOf { it.levelGained }.toFloat()
-            Metric.DURATION -> entry.value.sumOf { it.durationMinutes }.toFloat()
-            else -> 0f
-        }
-    }
-}
-
-private fun GameData.getTimeLabel(): String {
-    val formatter = SimpleDateFormat("dd.MM", Locale.getDefault())
-    return formatter.format(timestamp.toDate())
-}

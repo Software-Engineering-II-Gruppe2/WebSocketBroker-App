@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.runner.RunWith
-import org.junit.jupiter.api.Assertions.*
 
 @RunWith(AndroidJUnit4::class)
 class AuthActivityTest {

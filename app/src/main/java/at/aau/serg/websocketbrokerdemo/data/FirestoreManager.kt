@@ -14,11 +14,11 @@ object FirestoreManager {
     suspend fun saveUserProfile(userId: String, profile: PlayerProfile) {
         try {
             usersCollection.document(userId).set(profile).await()
-            Log.d("FirestoreManager", "UserProfile saved successfully for userId: $userId")
+            Log.d("FirestoreManager", "UserProfile saved successfully for current userId")
         } catch (e: FirebaseException) {
-            Log.e("FirestoreManager", "Error saving UserProfile for userId: $userId", e)
+            Log.e("FirestoreManager", "Error saving UserProfile for this userId ", e)
         } catch (e: Exception) {
-            Log.e("FirestoreManager", "An unexpected error occurred while saving UserProfile for userId: $userId", e)
+            Log.e("FirestoreManager", "An unexpected error occurred while saving UserProfile for actual userId", e)
         }
     }
 
@@ -26,13 +26,13 @@ object FirestoreManager {
         return try {
             val document = usersCollection.document(userId).get().await()
             val profile = document.toObject(PlayerProfile::class.java)
-            Log.d("FirestoreManager", "UserProfile retrieved successfully for userId: $userId")
+            Log.d("FirestoreManager", "UserProfile retrieved successfully for your userId")
             profile
         } catch (e: FirebaseException) {
-            Log.e("FirestoreManager", "Error retrieving UserProfile for userId: $userId", e)
+            Log.e("FirestoreManager", "Error retrieving UserProfile", e)
             null
         } catch (e: Exception) {
-            Log.e("FirestoreManager", "An unexpected error occurred while retrieving UserProfile for userId: $userId", e)
+            Log.e("FirestoreManager", "Unexpected error when retrieving profile", e)
             null
         }
     }
@@ -40,11 +40,11 @@ object FirestoreManager {
     suspend fun updateUserProfileName(userId: String, newName: String) {
         try {
             usersCollection.document(userId).update("name", newName).await()
-            Log.d("FirestoreManager", "UserProfile name updated successfully for userId: $userId")
+            Log.d("FirestoreManager", "UserProfile name updated successfully")
         } catch (e: FirebaseException) {
-            Log.e("FirestoreManager", "Error updating UserProfile name for userId: $userId", e)
+            Log.e("FirestoreManager", "Error updating UserProfile name", e)
         } catch (e: Exception) {
-            Log.e("FirestoreManager", "An unexpected error occurred while updating UserProfile name for userId: $userId", e)
+            Log.e("FirestoreManager", "Unexpected error when updating profile", e)
         }
     }
 

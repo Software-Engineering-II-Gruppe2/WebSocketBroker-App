@@ -1,6 +1,7 @@
 [versions]
 activityCompose = "1.8.0"
 agp = "8.9.2"
+coilCompose = "2.4.0"
 composeBom = "2024.09.00"
 constraintlayout = "2.2.1"
 coreKtxVersion = "1.6.1"
@@ -21,6 +22,8 @@ kotlin = "2.0.21"
 kotlinx-coroutines = "1.8.0"
 lifecycleRuntimeKtx = "2.6.1"
 mockito = "5.7.0"
+mockk = "1.13.5"
+mockkVersion = "1.13.7"
 navigation-compose = "2.5.3"
 uiTestJunit4Android = "1.7.8"
 
@@ -44,12 +47,14 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtxVersion" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebase-auth" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore", version.ref = "firebase-firestore" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitJupiterApi" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitJupiterApi" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
 krossbow-stomp-core = { module = "org.hildan.krossbow:krossbow-stomp-core", version.ref = "krossbowStompCore" }
 krossbow-websocket-builtin = { module = "org.hildan.krossbow:krossbow-websocket-builtin", version.ref = "krossbowWebsocketBuiltin" }
@@ -57,6 +62,8 @@ krossbow-websocket-okhttp = { module = "org.hildan.krossbow:krossbow-websocket-o
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+mockk-mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
+mockk-v1135 = { module = "io.mockk:mockk", version.ref = "mockk" }
 
 
 [plugins]

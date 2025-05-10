@@ -20,236 +20,152 @@ class GameWebSocketClientTest {
         `when`(context.assets).thenReturn(assetManager)
     }
 
-
-    @AfterEach
-    fun tearDown() {
-
+    private fun createClient(): GameWebSocketClient {
+        val props = "server.url=ws://example.com"
+        val input = ByteArrayInputStream(props.toByteArray())
+        `when`(assetManager.open("config.properties")).thenReturn(input)
+        return GameWebSocketClient(
+            context,
+            onConnected = { /* No-op */ },
+            onMessageReceived = { /* No-op */ },
+            onDiceRolled = { _, _ -> /* No-op */ },
+            onGameStateReceived = { /* No-op */ },
+            onPlayerTurn = { /* No-op */ },
+            onPlayerPassedGo = { /* No-op */ },
+            coroutineDispatcher = Dispatchers.IO,
+            onChatMessageReceived = { _, _ -> },
+            onCardDrawn = { _, _, _ -> },
+            onTaxPayment = { _, _, _ -> }
+        )
     }
 
     @Test
     fun testLoadServerUrl() {
-        // Arrange
-        val propertiesContent = "server.url=ws://example.com"
-        val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
-        `when`(assetManager.open("config.properties")).thenReturn(inputStream)
-
-        // Act
-        val client = GameWebSocketClient(
-            context,
-            onConnected = {},
-            onMessageReceived = {},
-            onDiceRolled = { _, _ -> },
-            onGameStateReceived = {},
-            onPlayerTurn = {},
-            onChatMessageReceived = { _, _ -> },
-            onPlayerPassedGo = { _ -> },
-            onTaxPayment = { _, _, _ -> },
-            coroutineDispatcher = Dispatchers.IO
-        )
-
-        // Zugriff auf private Property mittels Reflection
+        val client = createClient()
         val field = GameWebSocketClient::class.java.getDeclaredField("serverUrl")
         field.isAccessible = true
-        val loadedUrl = field.get(client) as String
-
-        // Assert
-        Assertions.assertEquals("ws://example.com", loadedUrl)
+        val url = field.get(client) as String
+        Assertions.assertEquals("ws://example.com", url)
     }
 
-
     @Test
-    fun testSendMessage() {
-        // Arrange
-        val propertiesContent = "server.url=ws://example.com"
-        val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
-        `when`(assetManager.open("config.properties")).thenReturn(inputStream)
+    fun testSendMessageDelegatesToWebSocket() {
+        val client = createClient()
+        val ws = mock(WebSocket::class.java)
+        val wsField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
+        wsField.isAccessible = true
+        wsField.set(client, ws)
 
-        var onConnectedCalled = false
-
-        val client = GameWebSocketClient(
-            context,
-            onConnected = {},
-            onMessageReceived = {},
-            onDiceRolled = { _, _ -> },
-            onGameStateReceived = {},
-            onPlayerTurn = {},
-            onChatMessageReceived = { _, _ -> },
-            onPlayerPassedGo = { _ -> },
-            onTaxPayment = { _, _, _ -> },
-            coroutineDispatcher = Dispatchers.IO
-        )
-
-        val mockWebSocket = mock(WebSocket::class.java)
-        val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
-        webSocketField.isAccessible = true
-        webSocketField.set(client, mockWebSocket)
-
-        // Act
-        client.sendMessage("Hello")
-
-        // Assert
-        verify(mockWebSocket, times(1)).send("Hello")
+        client.sendMessage("HelloWorld")
+        verify(ws, times(1)).send("HelloWorld")
     }
 
     @Test
     fun testSendChatMessage() {
-        // Arrange
-        val propertiesContent = "server.url=ws://example.com"
-        val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
-        `when`(assetManager.open("config.properties")).thenReturn(inputStream)
+        val client = createClient()
+        val ws = mock(WebSocket::class.java)
+        val wsField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
+        wsField.isAccessible = true
+        wsField.set(client, ws)
 
-        val client = GameWebSocketClient(
-            context,
-            onConnected = {},
-            onMessageReceived = {},
-            onDiceRolled = { _, _ -> },
-            onGameStateReceived = {},
-            onPlayerTurn = {},
-            onChatMessageReceived = { _, _ -> },
-            onPlayerPassedGo = { _ -> },
-            onTaxPayment = { _, _, _ -> },
-            coroutineDispatcher = Dispatchers.IO
-        )
-
-        val mockWebSocket = mock(WebSocket::class.java)
-        val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
-        webSocketField.isAccessible = true
-        webSocketField.set(client, mockWebSocket)
-
-        // Act
-        client.sendChatMessage("user123", "Hi!")
-
-        // Assert: expected JSON
-        val expectedJson = """{"type":"CHAT_MESSAGE","playerId":"user123","message":"Hi!"}"""
-        verify(mockWebSocket).send(expectedJson)
+        client.sendChatMessage("user123", "Hi there!")
+        val expected = "{\"type\":\"CHAT_MESSAGE\",\"playerId\":\"user123\",\"message\":\"Hi there!\"}"
+        verify(ws).send(expected)
     }
 
     @Test
     fun testRollDice() {
-        val propertiesContent = "server.url=ws://example.com"
-        val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
-        `when`(assetManager.open("config.properties")).thenReturn(inputStream)
+        val client = createClient()
+        val spyClient = spy(client)
+        doNothing().`when`(spyClient).sendMessage(anyString())
 
-        val client = GameWebSocketClient(
-            context,
-            onConnected = {},
-            onMessageReceived = {},
-            onDiceRolled = { _, _ -> },
-            onGameStateReceived = {},
-            onPlayerTurn = {},
-            onChatMessageReceived = { _, _ -> },
-            onPlayerPassedGo = { _ -> },
-            onTaxPayment = { _, _, _ -> },
-            coroutineDispatcher = Dispatchers.IO
-        )
-            
-
-        val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
-        webSocketField.isAccessible = true
-        val mockedWebSocket = mock(WebSocket::class.java)
-        webSocketField.set(client, mockedWebSocket)
-
-        client.rollDice()
-
-        verify(mockedWebSocket, times(1)).send("Roll")
+        spyClient.rollDice()
+        verify(spyClient).sendMessage("Roll")
     }
 
     @Test
-    fun testManualRollDice_ValidValue() {
-        val propertiesContent = "server.url=ws://example.com"
-        val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
-        `when`(assetManager.open("config.properties")).thenReturn(inputStream)
+    fun testManualRollDiceValid() {
+        val client = createClient()
+        val spyClient = spy(client)
+        doNothing().`when`(spyClient).sendMessage(anyString())
 
-        val client = GameWebSocketClient(
-            context,
-            onConnected = {},
-            onMessageReceived = {},
-            onDiceRolled = { _, _ -> },
-            onGameStateReceived = {},
-            onPlayerTurn = {},
-            onChatMessageReceived = { _, _ -> },
-            onPlayerPassedGo = { _ -> },
-            onTaxPayment = { _, _, _ -> },
-            coroutineDispatcher = Dispatchers.IO
-        )
-
-        val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
-        webSocketField.isAccessible = true
-        val mockedWebSocket = mock(WebSocket::class.java)
-        webSocketField.set(client, mockedWebSocket)
-
-        client.manualRollDice(20)
-
-        verify(mockedWebSocket, times(1)).send("MANUAL_ROLL:20")
+        spyClient.manualRollDice(10)
+        verify(spyClient).sendMessage("MANUAL_ROLL:10")
     }
 
     @Test
-    fun testManualRollDice_InvalidValue() {
-        val propertiesContent = "server.url=ws://example.com"
-        val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
-        `when`(assetManager.open("config.properties")).thenReturn(inputStream)
+    fun testManualRollDiceInvalid() {
+        val client = createClient()
+        val spyClient = spy(client)
+        doNothing().`when`(spyClient).sendMessage(anyString())
 
-        val client = GameWebSocketClient(
-            context,
-            onConnected = {},
-            onMessageReceived = {},
-            onDiceRolled = { _, _ -> },
-            onGameStateReceived = {},
-            onPlayerTurn = {},
-            onChatMessageReceived = { _, _ -> },
-            onPlayerPassedGo = { _ -> },
-            onTaxPayment = { _, _, _ -> },
-            coroutineDispatcher = Dispatchers.IO
-        )
-
-        val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
-        webSocketField.isAccessible = true
-        val mockedWebSocket = mock(WebSocket::class.java)
-        webSocketField.set(client, mockedWebSocket)
-
-        client.manualRollDice(40) // Invalid value
-
-        verify(mockedWebSocket, never()).send(anyString())
+        spyClient.manualRollDice(0)
+        spyClient.manualRollDice(40)
+        verify(spyClient, never()).sendMessage(startsWith("MANUAL_ROLL:"))
     }
 
     @Test
-    fun testManualRollDice_BoundaryValues() {
-        val propertiesContent = "server.url=ws://example.com"
-        val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
-        `when`(assetManager.open("config.properties")).thenReturn(inputStream)
+    fun testBuyProperty() {
+        val client = createClient()
+        val spyClient = spy(client)
+        doNothing().`when`(spyClient).sendMessage(anyString())
 
-        val client = GameWebSocketClient(
-            context,
-            onConnected = {},
-            onMessageReceived = {},
-            onDiceRolled = { _, _ -> },
-            onGameStateReceived = {},
-            onPlayerTurn = {},
-            onChatMessageReceived = { _, _ -> },
-            onPlayerPassedGo = { _ -> },
-            onTaxPayment = { _, _, _ -> },
-            coroutineDispatcher = Dispatchers.IO
-        )
+        spyClient.buyProperty(5)
+        verify(spyClient).sendMessage("BUY_PROPERTY:5")
+    }
 
-        val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
-        webSocketField.isAccessible = true
-        val mockedWebSocket = mock(WebSocket::class.java)
-        webSocketField.set(client, mockedWebSocket)
+    @Test
+    fun testSendTaxPayment() {
+        val client = createClient()
+        val spyClient = spy(client)
+        doNothing().`when`(spyClient).sendMessage(anyString())
 
-        // Test minimum valid value
-        client.manualRollDice(1)
-        verify(mockedWebSocket, times(1)).send("MANUAL_ROLL:1")
+        spyClient.sendTaxPayment("p1", 100, "INCOME_TAX")
+        verify(spyClient).sendMessage(contains("\"type\":\"TAX_PAYMENT\""))
+        verify(spyClient).sendMessage(contains("\"playerId\":\"p1\""))
+        verify(spyClient).sendMessage(contains("\"amount\":100"))
+        verify(spyClient).sendMessage(contains("\"taxType\":\"INCOME_TAX\""))
+    }
 
-        // Test maximum valid value
-        client.manualRollDice(39)
-        verify(mockedWebSocket, times(1)).send("MANUAL_ROLL:39")
+    @Test
+    fun testSendGiveUpMessage() {
+        val client = createClient()
+        val spyClient = spy(client)
+        doNothing().`when`(spyClient).sendMessage(anyString())
 
-        // Test value just below minimum
-        client.manualRollDice(0)
-        verify(mockedWebSocket, never()).send("MANUAL_ROLL:0")
+        spyClient.sendGiveUpMessage("u42")
+        verify(spyClient).sendMessage(contains("\"type\":\"GIVE_UP\""))
+        verify(spyClient).sendMessage(contains("\"userId\":\"u42\""))
+    }
 
-        // Test value just above maximum
-        client.manualRollDice(40)
-        verify(mockedWebSocket, never()).send("MANUAL_ROLL:40")
+
+    @Test
+    fun testSendPullCardCommunityChest() {
+        val client = createClient()
+        val spyClient = spy(client)
+        doNothing().`when`(spyClient).sendMessage(anyString())
+
+        spyClient.sendPullCard("p1", 2)
+        verify(spyClient).sendMessage(contains("\"cardType\":\"COMMUNITY_CHEST\""))
+    }
+
+    @Test
+    fun testSendPullCardChance() {
+        val client = createClient()
+        val spyClient = spy(client)
+        doNothing().`when`(spyClient).sendMessage(anyString())
+
+        spyClient.sendPullCard("p2", 7)
+        verify(spyClient).sendMessage(contains("\"cardType\":\"CHANCE\""))
+    }
+
+    @Test
+    fun testSendPullCardInvalid() {
+        val client = createClient()
+        val spyClient = spy(client)
+        doNothing().`when`(spyClient).sendMessage(anyString())
+
+        spyClient.sendPullCard("p3", 1)
+        verify(spyClient, never()).sendMessage(anyString())
     }
 }

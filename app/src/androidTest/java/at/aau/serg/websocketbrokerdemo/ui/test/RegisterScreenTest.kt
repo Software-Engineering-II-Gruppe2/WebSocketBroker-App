@@ -108,7 +108,10 @@ class RegisterScreenTest {
             }
 
             errorMessage.value?.let {
-                androidx.compose.material3.Text(it, color = androidx.compose.material3.MaterialTheme.colorScheme.error)
+                androidx.compose.material3.Text(
+                    it,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.error
+                )
             }
         }
 
@@ -133,7 +136,10 @@ class RegisterScreenTest {
             }
 
             errorMessage.value?.let {
-                androidx.compose.material3.Text(it, color = androidx.compose.material3.MaterialTheme.colorScheme.error)
+                androidx.compose.material3.Text(
+                    it,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.error
+                )
             }
         }
 
@@ -158,7 +164,10 @@ class RegisterScreenTest {
             }
 
             errorMessage.value?.let {
-                androidx.compose.material3.Text(it, color = androidx.compose.material3.MaterialTheme.colorScheme.error)
+                androidx.compose.material3.Text(
+                    it,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.error
+                )
             }
         }
 

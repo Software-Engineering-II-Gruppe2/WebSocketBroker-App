@@ -1,11 +1,12 @@
 package at.aau.serg.websocketbrokerdemo
 
 import at.aau.serg.websocketbrokerdemo.data.GameData
-import at.aau.serg.websocketbrokerdemo.ui.Metric
-import at.aau.serg.websocketbrokerdemo.ui.calculateChartData
-import at.aau.serg.websocketbrokerdemo.ui.cumulativeWins
-import at.aau.serg.websocketbrokerdemo.ui.filterByDate
-import at.aau.serg.websocketbrokerdemo.ui.groupByTime
+import at.aau.serg.websocketbrokerdemo.logic.ChartType
+import at.aau.serg.websocketbrokerdemo.logic.Metric
+import at.aau.serg.websocketbrokerdemo.logic.calculateChartData
+import at.aau.serg.websocketbrokerdemo.logic.cumulativeWins
+import at.aau.serg.websocketbrokerdemo.logic.filterByDate
+import at.aau.serg.websocketbrokerdemo.logic.groupByTime
 import com.google.firebase.Timestamp
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
@@ -88,4 +89,95 @@ class StatisticsScreenTest {
             { assertEquals(1f, max) }
         )
     }
+
+
+    @Test
+    fun `calculateChartData should call cumulativeWins for WINS metric`() {
+        val games = listOf(
+            createGame(1, won = true),
+            createGame(0, won = false)
+        )
+        val (data, max) = calculateChartData(games, "week", Metric.WINS)
+
+        assertAll(
+            { assertEquals(2, data.size) },
+            { assertTrue(max >= 1f) }
+        )
+    }
+
+    @Test
+    fun `filterByDate should return all for 'all' filter`() {
+        val games = listOf(
+            createGame(400),
+            createGame(10),
+            createGame(0)
+        )
+
+        val result = games.filterByDate("all")
+
+        assertEquals(3, result.size)
+    }
+
+    @Test
+    fun `filterByDate should return correct results for month filter`() {
+        val games = listOf(
+            createGame(10),
+            createGame(20),
+            createGame(90)
+        )
+
+        val result = games.filterByDate("month")
+
+        assertEquals(2, result.size)
+    }
+
+    @Test
+    fun `groupByTime should use day format for month filter`() {
+        val games = listOf(
+            createGame(5, money = 50),
+            createGame(5, money = 150),
+            createGame(2, money = 100)
+        )
+
+        val result = games.groupByTime("month", Metric.MONEY)
+
+        assertEquals(2, result.size)
+        assertTrue(result.values.contains(200f))
+        assertTrue(result.values.contains(100f))
+    }
+
+    @Test
+    fun `groupByTime should fallback to 0f for unknown metric`() {
+        val games = listOf(
+            createGame(1),
+            createGame(2)
+        )
+
+        val result = games.groupByTime("week", Metric.WINS)
+
+        assertEquals(2, result.size)
+        assertTrue(result.values.all { it == 0f })
+    }
+
+    @Test
+    fun `calculateChartData should default max to 0f when all values are 0`() {
+        val games = listOf(
+            createGame(1, money = 0),
+            createGame(2, money = 0)
+        )
+
+        val (data, max) = calculateChartData(games, "week", Metric.MONEY)
+
+        assertEquals(2, data.size)
+        assertEquals(0f, max)
+    }
+
+    @Test
+    fun `ChartType enum values should exist`() {
+        val types = ChartType.values()
+        assertEquals(2, types.size)
+        assertTrue(types.contains(ChartType.BAR))
+        assertTrue(types.contains(ChartType.LINE))
+    }
+
 }

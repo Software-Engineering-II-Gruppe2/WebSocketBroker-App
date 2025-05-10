@@ -4,7 +4,13 @@ import com.example.myapplication.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -19,21 +25,25 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
-import at.aau.serg.websocketbrokerdemo.data.properties.Property
 
 @Composable
 fun Gameboard(
     modifier: Modifier = Modifier,
     onTileClick: (tilePosition: Int) -> Unit = {},
-    players: List<PlayerMoney> = emptyList(),
-    properties: List<Property>
+    players: List<PlayerMoney> = emptyList()
 ) {
     // Make the corners bigger like in a real monopoly board
-    val cornerFactor  = 1.5f
+    val cornerFactor = 1.5f
     val regularFactor = 1f
 
     // TODO: change the circles to real game pieces later
-    val playerColors = listOf(Color.Red, Color.Blue, Color.Green, Color.Yellow)
+    //Changed the cirles to pictures
+    val playerImages = listOf(
+        R.drawable.player_red,
+        R.drawable.player_blue,
+        R.drawable.player_green,
+        R.drawable.player_yellow
+    )
     val boardPainter = painterResource(R.drawable.monopoly_board)
 
     Box(
@@ -61,9 +71,9 @@ fun Gameboard(
                     verticalAlignment = Alignment.Bottom
                 ) {
                     repeat(11) { col ->
-                        val tilePos       = calculateTilePosition(row, col)
+                        val tilePos = calculateTilePosition(row, col)
                         val playersOnTile = players.filter { it.position == tilePos }
-                        val isCorner   = (row == 0 || row == 10) && (col == 0 || col == 10)
+                        val isCorner = (row == 0 || row == 10) && (col == 0 || col == 10)
                         val tileWeight = if (isCorner) cornerFactor else regularFactor
 
                         Box(
@@ -77,22 +87,37 @@ fun Gameboard(
                             contentAlignment = Alignment.Center
                         ) {
                             if (playersOnTile.isNotEmpty()) {
-                                Row(
-                                    modifier = Modifier.fillMaxSize(0.8f),
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    playersOnTile.forEach { player ->
-                                        val idx   = players.indexOfFirst { it.id == player.id }
-                                        val color = playerColors.getOrElse(idx) { playerColors.random() }
+                                val gridAlignments = listOf(
+                                    Alignment.TopStart,
+                                    Alignment.TopEnd,
+                                    Alignment.BottomStart,
+                                    Alignment.BottomEnd
+                                )
+
+                                Box(modifier = Modifier.fillMaxSize(0.8f)) {
+                                    playersOnTile.forEachIndexed { index, player ->
+                                        val idx = players.indexOfFirst { it.id == player.id }
+                                        val imageRes =
+                                            playerImages.getOrElse(idx) { R.drawable.player_red }
+
                                         Box(
                                             modifier = Modifier
-                                                .size(12.dp)
-                                                .background(color, CircleShape)
-                                                .testTag("playerCircle_${player.id}")
-                                        )
+                                                .size(60.dp)
+                                                .align(gridAlignments.getOrElse(index) { Alignment.Center }) // Max. 4 Spieler
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = imageRes),
+                                                contentDescription = "Player ${player.id}",
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .clip(CircleShape)
+                                                    .testTag("playerImage_${player.id}"),
+                                                contentScale = ContentScale.Fit
+                                            )
+                                        }
                                     }
                                 }
+
                             }
                         }
                     }

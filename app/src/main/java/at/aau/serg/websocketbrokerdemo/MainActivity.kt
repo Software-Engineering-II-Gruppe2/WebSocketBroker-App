@@ -4,13 +4,22 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import at.aau.serg.websocketbrokerdemo.ui.LobbyScreen
-import androidx.navigation.compose.*
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
@@ -96,9 +105,9 @@ class MainActivity : ComponentActivity() {
         val webSocketClient = remember {
             GameWebSocketClient(
                 context = context,
-                onConnected       = { log += "Connected to server\n" },
+                onConnected = { log += "Connected to server\n" },
                 onMessageReceived = { msg -> log += "Received: $msg\n" },
-                onDiceRolled      = { pid, value -> dicePlayer = pid; diceValue = value },
+                onDiceRolled = { pid, value -> dicePlayer = pid; diceValue = value },
                 onGameStateReceived = { players ->
                     playerMoneyList = players
                     // (you already had logic for matching firebase ID → session-ID)
@@ -113,7 +122,7 @@ class MainActivity : ComponentActivity() {
                     val senderName = playerMoneyList.find { it.id == senderId }?.name ?: "Unknown"
                     chatMessages.add(ChatEntry(senderId, senderName, text))
                 },
-                onPlayerPassedGo  = { playerName ->
+                onPlayerPassedGo = { playerName ->
                     passedGoPlayerName = playerName
                     showPassedGoAlert = true
                 },
@@ -122,7 +131,19 @@ class MainActivity : ComponentActivity() {
                     taxPaymentAmount = amount
                     taxPaymentType = taxType
                     showTaxPaymentAlert = true
-                }
+                },
+                onCardDrawn = { _, cardType, description ->
+                    CoroutineScope(Dispatchers.Main).launch {
+                        Toast
+                            .makeText(
+                                context,
+                                "You drew a $cardType card: $description",
+                                Toast.LENGTH_LONG
+                            )
+                            .show()
+                    }
+                },
+                coroutineDispatcher = Dispatchers.IO
             )
         }
 
@@ -195,16 +216,23 @@ class MainActivity : ComponentActivity() {
             }
             composable("playerInfo") {
                 // Add debug logging for player ID
-                android.util.Log.d("MainActivity", "Passing current game player ID to PlayboardScreen: $currentGamePlayerId")
+                android.util.Log.d(
+                    "MainActivity",
+                    "Passing current game player ID to PlayboardScreen: $currentGamePlayerId"
+                )
+                android.util.Log.d(
+                    "MainActivity",
+                    "Passing current game player ID to PlayboardScreen: $currentGamePlayerId"
+                )
                 android.util.Log.d("MainActivity", "Current game state players: $playerMoneyList")
-                
+
                 PlayboardScreen(
                     players = playerMoneyList,
                     currentPlayerId = currentGamePlayerId ?: "",
-                    onRollDice = { webSocketClient.sendMessage("Roll")},
+                    onRollDice = { webSocketClient.sendMessage("Roll") },
                     onBackToLobby = { navController.navigate("lobby") },
-                    diceResult      = diceValue,
-                    dicePlayerId    = dicePlayer,
+                    diceResult = diceValue,
+                    dicePlayerId = dicePlayer,
                     webSocketClient = webSocketClient,
                     localPlayerId = localPlayerId ?: "",
                     chatMessages = chatMessages,
@@ -213,7 +241,14 @@ class MainActivity : ComponentActivity() {
                     showTaxPaymentAlert = showTaxPaymentAlert,
                     taxPaymentPlayerName = taxPaymentPlayerName,
                     taxPaymentAmount = taxPaymentAmount,
-                    taxPaymentType = taxPaymentType
+                    taxPaymentType = taxPaymentType,
+                    onGiveUp = {
+                        localPlayerId?.let {
+                            webSocketClient.sendGiveUpMessage(it)
+                            webSocketClient.close()
+                            navController.navigate("lobby")
+                        }
+                    }
                 )
             }
             composable("leaderboard") {
@@ -224,5 +259,5 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-        }
+}
 
