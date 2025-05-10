@@ -2,11 +2,11 @@ package at.aau.serg.websocketbrokerdemo
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import at.aau.serg.websocketbrokerdemo.data.ChatMessage
-import at.aau.serg.websocketbrokerdemo.data.DiceRollMessage
-import at.aau.serg.websocketbrokerdemo.data.DrawnCardMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.ChatMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DiceRollMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DrawnCardMessage
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
-import at.aau.serg.websocketbrokerdemo.data.TaxPaymentMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.TaxPaymentMessage
 
 class MessageParser(
     private val gson: Gson,

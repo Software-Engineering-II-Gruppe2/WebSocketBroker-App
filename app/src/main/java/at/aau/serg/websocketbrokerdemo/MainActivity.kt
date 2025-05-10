@@ -244,7 +244,7 @@ class MainActivity : ComponentActivity() {
                     taxPaymentType = taxPaymentType,
                     onGiveUp = {
                         localPlayerId?.let {
-                            webSocketClient.sendGiveUpMessage(it)
+                            webSocketClient.logic().sendGiveUpMessage(it)
                             webSocketClient.close()
                             navController.navigate("lobby")
                         }

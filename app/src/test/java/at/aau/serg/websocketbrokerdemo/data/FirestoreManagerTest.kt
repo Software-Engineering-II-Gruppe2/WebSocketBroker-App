@@ -85,3 +85,5 @@ class FirestoreManagerTest {
         verify(documentReference).update("name", newName)
     }
 }
+
+

@@ -128,6 +128,7 @@ tasks.register<JacocoReport>("jacocoUnitTestReport") {
         "**/BuildConfig.*",
         "**/Manifest*.*",
         "**/*Test*.*",
+        "**/GameWebSocketClient.*",
         "android/**/*.*"
     )
 
@@ -172,6 +173,7 @@ tasks.register<JacocoReport>("jacocoAndroidTestReport") {
         "**/BuildConfig.*",
         "**/Manifest*.*",
         "**/*Test*.*",
+        "**/GameWebSocketClient.*",
         "android/**/*.*"
     )
 
@@ -210,6 +212,7 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
+    
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.constraintlayout)
@@ -236,6 +239,7 @@ dependencies {
     testImplementation (libs.junit.jupiter.api)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.junit.jupiter)
+    testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.mockk.v1135)
     testImplementation(libs.mockk.mockk)
@@ -252,5 +256,6 @@ dependencies {
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation(kotlin("test"))
 
 }

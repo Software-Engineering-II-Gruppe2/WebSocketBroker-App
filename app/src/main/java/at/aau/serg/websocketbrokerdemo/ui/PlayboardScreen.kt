@@ -148,7 +148,7 @@ fun PlayboardScreen(
                     if (showPassedGoAlert) {
                         delay(3000) // Wait for GO alert to finish
                     }
-                    webSocketClient.sendTaxPayment(
+                    webSocketClient.logic().sendTaxPayment(
                         playerId = currentPlayer.id,
                         amount = 200,
                         taxType = "EINKOMMENSTEUER"
@@ -159,7 +159,7 @@ fun PlayboardScreen(
                     if (showPassedGoAlert) {
                         delay(3000) // Wait for GO alert to finish
                     }
-                    webSocketClient.sendTaxPayment(
+                    webSocketClient.logic().sendTaxPayment(
                         playerId = currentPlayer.id,
                         amount = 100,
                         taxType = "ZUSATZSTEUER"
@@ -169,7 +169,7 @@ fun PlayboardScreen(
 
             when (newPosition) {
                 2, 17, 7, 22, 33, 36 -> {
-                    webSocketClient.sendPullCard(currentPlayer.id, newPosition)
+                    webSocketClient.logic().sendPullCard(currentPlayer.id, newPosition)
                 }
             }
 
@@ -269,7 +269,7 @@ fun PlayboardScreen(
                 Button(
                     onClick = {
                         manualDiceValue.toIntOrNull()?.let { value ->
-                            webSocketClient.manualRollDice(value)
+                            webSocketClient.logic().manualRollDice(value)
                             manualDiceValue = ""
                         }
                     },
@@ -623,7 +623,7 @@ fun PlayboardScreen(
                         Button(
                             onClick = {
                                 if (chatInput.isNotBlank()) {
-                                    webSocketClient.sendChatMessage(currentPlayerId, chatInput)
+                                    webSocketClient.logic().sendChatMessage(currentPlayerId, chatInput)
                                     chatInput = "" // Nach Senden Eingabefeld leeren
                                 }
                             }

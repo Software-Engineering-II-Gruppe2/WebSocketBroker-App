@@ -1,13 +1,14 @@
 package at.aau.serg.websocketbrokerdemo.data
 
 import android.util.Log
+import at.aau.serg.websocketbrokerdemo.logic.UserProfileProvider
 import com.google.firebase.FirebaseException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import java.util.Date
 
-object FirestoreManager {
+object FirestoreManager : UserProfileProvider{
     private val db = FirebaseFirestore.getInstance()
     private val usersCollection = db.collection("users")
 
@@ -22,7 +23,7 @@ object FirestoreManager {
         }
     }
 
-    suspend fun getUserProfile(userId: String): PlayerProfile? {
+    override suspend fun getUserProfile(userId: String): PlayerProfile? {
         return try {
             val document = usersCollection.document(userId).get().await()
             val profile = document.toObject(PlayerProfile::class.java)
