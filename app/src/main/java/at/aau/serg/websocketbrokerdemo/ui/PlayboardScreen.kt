@@ -551,6 +551,8 @@ fun PlayboardScreen(
             }
         }
 
+        // fixme extract @composable boxes for these alerts and other stuff, e.g. TaxPaymentAlertBox
+        //  for all the conditially-shown sub components
         // Tax Payment Alert
         if (showTaxPaymentAlert) {
             Box(

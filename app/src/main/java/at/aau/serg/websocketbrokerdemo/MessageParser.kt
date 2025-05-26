@@ -27,6 +27,7 @@ class MessageParser(
     private val onHasWon: (winnerId: String) -> Unit,
     private val onMessageReceived: (text: String) -> Unit
 ) {
+    // fixme extract indiviual methods per message
     fun parse(text: String) {
         // 1) TAX_PAYMENT
         try {
