@@ -1,5 +1,6 @@
 package android.util;
 
+// fixme whats this Java class doing here
 public class Log {
     public static int d(String tag, String msg) { return 0; }
     public static int e(String tag, String msg) { return 0; }

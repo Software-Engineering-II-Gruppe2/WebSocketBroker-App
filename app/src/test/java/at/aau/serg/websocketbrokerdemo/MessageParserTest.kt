@@ -20,6 +20,7 @@ class MessageParserTest {
         gson = Gson()
     }
 
+    // fixme test names to convey what they test, setup, and expect
     @Test
     fun testTaxPayment() {
         val json = """{"type":"TAX_PAYMENT","playerId":"p1","amount":250,"taxType":"INCOME"}"""
