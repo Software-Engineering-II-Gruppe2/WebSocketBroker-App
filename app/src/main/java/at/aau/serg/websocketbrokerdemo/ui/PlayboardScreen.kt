@@ -1002,7 +1002,7 @@ fun PropertySetPopup(
     AlertDialog(
         modifier = Modifier
             .width(420.dp)
-            .height(400.dp),
+            .height(550.dp),
         onDismissRequest = onDismiss,
         title = {
             Text(
@@ -1057,30 +1057,32 @@ fun PropertySetPopup(
             }
         },
         confirmButton = {
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (ownedProperties.isNotEmpty()) {
+                ownedProperties.forEach { property ->
                     Button(
                         onClick = { 
-                            ownedProperties.firstOrNull()?.let { property ->
-                                onSellProperty(property.id)
-                                onDismiss()
-                            }
+                            onSellProperty(property.id)
+                            onDismiss()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
                         shape = RoundedCornerShape(20.dp),
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
                     ) {
-                        Text("Sell Property", color = Color.White)
+                        Text("Sell ${property.name}", color = Color.White)
                     }
                 }
                 Button(
                     onClick = onDismiss,
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
                     shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
                 ) {
                     Text("Exit", color = Color.White)
                 }
