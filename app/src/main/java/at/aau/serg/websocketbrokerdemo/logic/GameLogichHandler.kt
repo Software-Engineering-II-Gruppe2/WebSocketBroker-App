@@ -9,6 +9,7 @@ import at.aau.serg.websocketbrokerdemo.data.messages.GiveUpMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.PullCardMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.TaxPaymentMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.RentPaymentMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.SellPropertyMessage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher
@@ -129,6 +130,17 @@ class GameLogicHandler(
             Log.d("GameLogic", "Sent rent payment message: $json")
         } ?: run {
             Log.e("GameLogic", "Failed to send rent payment: No user ID available")
+        }
+    }
+
+    fun sellProperty(propertyId: Int) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        currentUser?.uid?.let { userId ->
+            val message = "SELL_PROPERTY:$propertyId"
+            sendMessage(message)
+            Log.d("GameLogic", "Sent sell property message: $message")
+        } ?: run {
+            Log.e("GameLogic", "Failed to send sell property message: No user ID available")
         }
     }
 }

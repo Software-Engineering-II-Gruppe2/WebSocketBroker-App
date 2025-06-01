@@ -29,7 +29,7 @@ class GameWebSocketClient(
     private val onCardDrawn: (playerId: String, cardType: String, description: String) -> Unit,
     private val onTaxPayment: (playerName: String, amount: Int, taxType: String) -> Unit,
     private val onClearChat: () -> Unit,
-    ) {
+) {
 
     private val client = OkHttpClient()
     private var webSocket: WebSocket? = null
