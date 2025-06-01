@@ -173,4 +173,19 @@ class GameWebSocketClientTest {
         spyClient.logic().sendPullCard("p3", 1)
         verify(spyClient, never()).sendMessage(anyString())
     }
+
+    @Test
+    fun testSellProperty() {
+        val client = createClient()
+        val spyClient = spy(client)
+        doNothing().`when`(spyClient).sendMessage(anyString())
+
+        // Test successful property sale
+        spyClient.logic().sellProperty(5)
+        verify(spyClient).sendMessage("SELL_PROPERTY:5")
+
+        // Test with different property ID
+        spyClient.logic().sellProperty(10)
+        verify(spyClient).sendMessage("SELL_PROPERTY:10")
+    }
 }
