@@ -4,5 +4,6 @@ data class PlayerMoney(
     val id: String,
     val name: String,
     val money: Int,
-    val position: Int
+    val position: Int,
+    val bot: Boolean
 )
