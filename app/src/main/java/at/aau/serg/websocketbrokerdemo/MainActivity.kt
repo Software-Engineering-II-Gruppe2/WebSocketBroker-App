@@ -1,6 +1,6 @@
 //main activity
 package at.aau.serg.websocketbrokerdemo
-
+import at.aau.serg.websocketbrokerdemo.logic.SoundPlayer
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -39,6 +39,7 @@ import at.aau.serg.websocketbrokerdemo.ui.GameHelp
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
 import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
 import at.aau.serg.websocketbrokerdemo.ui.WinScreen
+import com.example.myapplication.R
 import kotlinx.coroutines.delay
 
 import kotlinx.coroutines.launch
@@ -81,7 +82,10 @@ class MainActivity : ComponentActivity() {
         var drawnCardId by remember { mutableStateOf<Int?>(null) }
         var drawnCardDesc by remember { mutableStateOf<String?>(null) }
         var shouldNavigateToLobby by remember { mutableStateOf(false) }
-
+        var jailedPlayerName by remember { mutableStateOf<String?>(null) }
+        var showJailAlert by remember { mutableStateOf(false) }
+        val soundPlayer = remember { SoundPlayer(context) }
+        var onPlayerSentToJail: ((String) -> Unit)? by remember { mutableStateOf(null) }
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
         val userId = auth.currentUser?.uid
@@ -166,6 +170,12 @@ class MainActivity : ComponentActivity() {
                 onPlayerPassedGo = { playerName ->
                     passedGoPlayerName = playerName
                     showPassedGoAlert = true
+                },
+                onPlayerSentToJail = { playerName: String ->
+                    jailedPlayerName = playerName
+                    showJailAlert = true
+                    soundPlayer.playSound(R.raw.jaildoorclose_6173)
+
                 },
                 onTaxPayment = { playerName, amount, taxType ->
                     taxPaymentPlayerName = playerName
@@ -363,6 +373,7 @@ class MainActivity : ComponentActivity() {
         if (showHelp) {
             GameHelp(onClose = { showHelp = false })
         }
+
     }
 
 }
