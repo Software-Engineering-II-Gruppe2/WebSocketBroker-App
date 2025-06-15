@@ -2,10 +2,9 @@ package at.aau.serg.websocketbrokerdemo
 
 import at.aau.serg.websocketbrokerdemo.data.properties.DummyProperty
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
-import at.aau.serg.websocketbrokerdemo.data.properties.copyWithOwner
-import at.aau.serg.websocketbrokerdemo.ui.checkCompleteSet
-import at.aau.serg.websocketbrokerdemo.ui.getColorForPosition
-import org.junit.Assert.*
+import at.aau.serg.websocketbrokerdemo.ui.components.checkCompleteSet
+import at.aau.serg.websocketbrokerdemo.ui.components.getColorForPosition
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 
@@ -13,9 +12,9 @@ class PropertyUtilsTest {
 
     @Test
     fun getColorForPosition_returnsCorrectColor() {
-        assertEquals(PropertyColor.BROWN, getColorForPosition(1))
-        assertEquals(PropertyColor.LIGHT_BLUE, getColorForPosition(6))
-        assertEquals(PropertyColor.DARK_BLUE, getColorForPosition(39))
+        Assertions.assertEquals(PropertyColor.BROWN, getColorForPosition(1))
+        Assertions.assertEquals(PropertyColor.LIGHT_BLUE, getColorForPosition(6))
+        Assertions.assertEquals(PropertyColor.DARK_BLUE, getColorForPosition(39))
     }
 
     @Test
@@ -26,8 +25,7 @@ class PropertyUtilsTest {
             DummyProperty(23, 23, color),
             DummyProperty(24, 24, color)
         )
-        val all = owned
-        assertTrue(checkCompleteSet(color, owned, all))
+        Assertions.assertTrue(checkCompleteSet(color, owned, owned))
     }
 
     @Test
@@ -42,7 +40,7 @@ class PropertyUtilsTest {
             DummyProperty(27, 27, color),
             DummyProperty(29, 29, color)
         )
-        assertFalse(checkCompleteSet(color, owned, all))
+        Assertions.assertFalse(checkCompleteSet(color, owned, all))
     }
 
     @Test
@@ -57,12 +55,12 @@ class PropertyUtilsTest {
             DummyProperty(32, 32, color),
             DummyProperty(34, 34, color)
         )
-        assertFalse(checkCompleteSet(color, owned, all))
+        Assertions.assertFalse(checkCompleteSet(color, owned, all))
     }
     @Test
     fun copyWithOwner_setsNewOwnerIdCorrectly() {
         val original = DummyProperty(1, 1, PropertyColor.RED)
         val updated = original.copyWithOwner("abc123")
-        assertEquals("abc123", updated.ownerId)
+        Assertions.assertEquals("abc123", updated.ownerId)
     }
 }

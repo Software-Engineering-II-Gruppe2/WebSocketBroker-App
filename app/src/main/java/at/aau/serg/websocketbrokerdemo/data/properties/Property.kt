@@ -8,6 +8,7 @@ sealed class Property {
     abstract val position: Int
     abstract val image: String
     abstract val isMortgaged: Boolean
+    abstract fun copyWithOwner(newOwnerId: String?): Property
 }
 
 data class DummyProperty(
@@ -20,4 +21,7 @@ data class DummyProperty(
     override val purchasePrice = 0
     override val image = ""
     override val isMortgaged = false
+    override fun copyWithOwner(newOwnerId: String?): Property {
+        return this.copy(ownerId = newOwnerId)
+    }
 }

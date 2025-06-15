@@ -10,7 +10,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.ui.Gameboard
-import at.aau.serg.websocketbrokerdemo.ui.calculateTilePosition
+import at.aau.serg.websocketbrokerdemo.logic.TilePositionCalculator
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -106,24 +106,24 @@ class GameboardAndroidTest {
 
     @Test
     fun testCalculateTilePosition_corners() {
-        assert(calculateTilePosition(10, 10) == 0)   // Start
-        assert(calculateTilePosition(10, 0) == 10)
-        assert(calculateTilePosition(0, 0) == 20)
-        assert(calculateTilePosition(0, 10) == 30)
+        assert(TilePositionCalculator.calculateTilePosition(10, 10) == 0)   // Start
+        assert(TilePositionCalculator.calculateTilePosition(10, 0) == 10)
+        assert(TilePositionCalculator.calculateTilePosition(0, 0) == 20)
+        assert(TilePositionCalculator.calculateTilePosition(0, 10) == 30)
     }
 
     @Test
     fun testCalculateTilePosition_edges() {
-        assert(calculateTilePosition(10, 5) == 5)
-        assert(calculateTilePosition(5, 0) == 15)
-        assert(calculateTilePosition(0, 5) == 25)
-        assert(calculateTilePosition(5, 10) == 35)
+        assert(TilePositionCalculator.calculateTilePosition(10, 5) == 5)
+        assert(TilePositionCalculator.calculateTilePosition(5, 0) == 15)
+        assert(TilePositionCalculator.calculateTilePosition(0, 5) == 25)
+        assert(TilePositionCalculator.calculateTilePosition(5, 10) == 35)
     }
 
     @Test
     fun testCalculateTilePosition_invalid() {
-        assert(calculateTilePosition(5, 5) == -1) // Inner tile
-        assert(calculateTilePosition(11, 11) == -1) // Out of bounds
+        assert(TilePositionCalculator.calculateTilePosition(5, 5) == -1) // Inner tile
+        assert(TilePositionCalculator.calculateTilePosition(11, 11) == -1) // Out of bounds
     }
 
     @Test

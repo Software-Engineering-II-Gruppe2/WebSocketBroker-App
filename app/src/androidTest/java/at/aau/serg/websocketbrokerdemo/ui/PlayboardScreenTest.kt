@@ -1,5 +1,6 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.assertIsDisplayed
@@ -15,9 +16,7 @@ import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import at.aau.serg.websocketbrokerdemo.data.properties.DummyProperty
 import at.aau.serg.websocketbrokerdemo.data.properties.HouseableProperty
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
-import at.aau.serg.websocketbrokerdemo.data.properties.copyWithOwner
-import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
-import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
+import at.aau.serg.websocketbrokerdemo.ui.components.PlayerCard
 import kotlinx.coroutines.test.runTest
 import org.junit.Ignore
 import org.junit.Rule
@@ -36,6 +35,7 @@ class PlayboardScreenTest {
 
     private val emptyChat = emptyList<ChatEntry>()
     private val emptyCheat = emptyList<CheatEntry>()
+    private val gameEvents = mutableStateListOf<String>()
 
     @Test
     fun testPlayboardScreenDisplaysPlayers() {
@@ -81,7 +81,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -125,7 +127,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -170,7 +174,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -216,7 +222,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -261,7 +269,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -310,7 +320,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -364,7 +376,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -417,7 +431,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -469,7 +485,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 

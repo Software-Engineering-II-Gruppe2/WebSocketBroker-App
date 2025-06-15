@@ -11,4 +11,8 @@ data class TrainStation(
     val rent4Stations: Int,
     override val image: String,
     override val isMortgaged: Boolean, override var ownerId: String?
-) : Property()
+) : Property() {
+    override fun copyWithOwner(newOwnerId: String?): Property {
+        return this.copy(ownerId = newOwnerId)
+    }
+}

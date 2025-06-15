@@ -63,11 +63,11 @@ fun GameHelp(onClose: () -> Unit) {
                             containerColor = Color.Transparent,
                             contentColor = Color.Black,
                             indicator = { tabPositions ->
-                                TabRowDefaults.Indicator(
-                                    Modifier
+                                TabRowDefaults.PrimaryIndicator(
+                                    modifier = Modifier
                                         .tabIndicatorOffset(tabPositions[selectedTabIndex])
                                         .height(3.dp),
-                                    color = Color(0xFF007AFF)
+                                    color = Color(0xFFE57373)
                                 )
                             }
                         ) {

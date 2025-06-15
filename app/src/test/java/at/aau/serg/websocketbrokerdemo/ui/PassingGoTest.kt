@@ -9,6 +9,7 @@ import org.junit.Test
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.delay
 import android.content.Context
+import androidx.compose.runtime.mutableStateListOf
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import io.mockk.mockk
@@ -22,6 +23,8 @@ class PassingGoTest {
     private val mockContext = mockk<Context>(relaxed = true)
     private val emptyChat = emptyList<ChatEntry>()
     private val emptyCheat = emptyList<CheatEntry>()
+    private val gameEvents = mutableStateListOf<String>()
+
     private val mockWebSocketClient = GameWebSocketClient(
         context = mockContext,
         onConnected = { /* No-op for testing */ },
@@ -78,7 +81,9 @@ class PassingGoTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -124,7 +129,9 @@ class PassingGoTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -165,7 +172,9 @@ class PassingGoTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -209,7 +218,9 @@ class PassingGoTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -260,7 +271,9 @@ class PassingGoTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 

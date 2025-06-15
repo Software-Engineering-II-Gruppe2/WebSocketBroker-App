@@ -5,9 +5,11 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -35,11 +37,13 @@ import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseType
 import at.aau.serg.websocketbrokerdemo.ui.GameHelp
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
 import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
 import at.aau.serg.websocketbrokerdemo.ui.WinScreen
 import com.example.myapplication.R
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
 
 import kotlinx.coroutines.launch
@@ -53,6 +57,10 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MonopolyWebSocketApp() {
         val context = LocalContext.current
+        fun showToast(message: String) {
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        }
+
         var showHelp by remember { mutableStateOf(false) }
         var message by remember { mutableStateOf("") }
         var log by remember { mutableStateOf("Logs:\n") }
@@ -82,6 +90,9 @@ class MainActivity : ComponentActivity() {
         var drawnCardId by remember { mutableStateOf<Int?>(null) }
         var drawnCardDesc by remember { mutableStateOf<String?>(null) }
         var shouldNavigateToLobby by remember { mutableStateOf(false) }
+        var hasGivenUp by remember { mutableStateOf(false) }
+        val avatarMap = remember { mutableStateMapOf<String, Int>() }
+
         var jailedPlayerName by remember { mutableStateOf<String?>(null) }
         var showJailAlert by remember { mutableStateOf(false) }
         val soundPlayer = remember { SoundPlayer(context) }
@@ -89,6 +100,15 @@ class MainActivity : ComponentActivity() {
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
         val userId = auth.currentUser?.uid
+
+        val availableAvatars = remember {
+            mutableStateListOf(
+                R.drawable.player_red,
+                R.drawable.player_blue,
+                R.drawable.player_green,
+                R.drawable.player_yellow
+            )
+        }
 
         // Show passed GO alert for 3 seconds
         LaunchedEffect(showPassedGoAlert) {
@@ -118,17 +138,24 @@ class MainActivity : ComponentActivity() {
                     ?: playerMoneyList.firstOrNull()?.id
                             ?: userId // Fallback to Firebase ID if no players exist yet
             }
+            //Figurzuweisung gleich hier machen
+            playerMoneyList.forEach { player ->
+                if (avatarMap[player.id] == null && availableAvatars.isNotEmpty()) {
+                    avatarMap[player.id] = availableAvatars.removeAt(0)
+                }
+            }
         }
 
         LaunchedEffect(userId) {
             if (userId != null) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    playerProfile = FirestoreManager.getUserProfile(userId)
+                FirestoreManager.listenToUserProfile(userId) { updatedProfile ->
+                    playerProfile = updatedProfile
                 }
             }
         }
 
         // Create websocket client
+        val gameEvents = remember { mutableStateListOf<String>() }
         val webSocketClient = remember {
             GameWebSocketClient(
                 context = context,
@@ -142,6 +169,17 @@ class MainActivity : ComponentActivity() {
                     if (pid == localPlayerId) {
                         hasRolled = !isPasch
                         hasPasch = isPasch
+                    }
+                    if (isPasch && pid == localPlayerId) {
+                        gameEvents.add("🎉 Double rolled!!")
+
+                        CoroutineScope(Dispatchers.Main).launch {
+                            Toast.makeText(
+                                context,
+                                "🎲 Double rolled! You can dice again.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 },
                 onHasWon = { winnerId ->
@@ -197,11 +235,23 @@ class MainActivity : ComponentActivity() {
                     currentDealProposal = proposal
                     showIncomingDialog = true
                 },
-                onDealResponse = { response -> currentDealResponse = response },
-                onGiveUpReceived = {
-                    // GIVE_UP message from the server -> go to lobby
-                    shouldNavigateToLobby = true
+                onDealResponse = { response ->
+                    currentDealResponse = response
+                    val msg = when (response.responseType) {
+                        DealResponseType.ACCEPT -> "✅ Deal accepted"
+                        DealResponseType.DECLINE -> "❌ Deal declined"
+                        DealResponseType.COUNTER -> "🤝 Counter-proposal sent"
+                    }
+                    gameEvents.add(msg)
                 },
+                onGiveUpReceived = { givingUpUserId ->
+                    // Only navigate user who has given up, not everyone
+                    if (givingUpUserId == userId) {
+                        hasGivenUp = true
+                        shouldNavigateToLobby = true
+                    }
+                },
+
                 coroutineDispatcher = Dispatchers.IO
             )
         }
@@ -248,11 +298,13 @@ class MainActivity : ComponentActivity() {
                     log = log,
                     playerCount = playerCount,
                     onMessageChange = { message = it },
-                    onConnect = { webSocketClient.connect() },
+                    onConnect = { webSocketClient.connect()
+                        showToast("✅ Connection with the server")},
                     onDisconnect = {
                         webSocketClient.close()
                         log = "Logs:\n" // Clear the log
                         log += "Disconnected from server\n"
+                        showToast("⚠️ Disconnected from server.")
                     },
                     onSendMessage = {
                         if (message.isNotEmpty()) {
@@ -285,12 +337,39 @@ class MainActivity : ComponentActivity() {
                 })
             }
             composable("profile") {
+                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                var profile by remember { mutableStateOf<PlayerProfile?>(null) }
+                DisposableEffect(userId) {
+                    if (userId != null) {
+                        val listenerRegistration = FirebaseFirestore.getInstance()
+                            .collection("users")
+                            .document(userId)
+                            .addSnapshotListener { snapshot, error ->
+                                if (error != null) {
+                                    Log.e("ProfileScreen", "Listener failed", error)
+                                    return@addSnapshotListener
+                                }
+
+                                if (snapshot != null && snapshot.exists()) {
+                                    profile = snapshot.toObject(PlayerProfile::class.java)
+                                }
+                            }
+                        onDispose {
+                            listenerRegistration.remove()
+                        }
+                    } else {
+                        onDispose { /* nothing */ }
+                    }
+                }
+
                 UserProfileScreen(
-                    playerProfile = playerProfile,
+                    playerProfile = profile,
                     onNameChange = { newName ->
                         CoroutineScope(Dispatchers.IO).launch {
-                            userId?.let { FirestoreManager.updateUserProfileName(it, newName) }
-                            playerProfile = playerProfile?.copy(name = newName)
+                            userId?.let {
+                                FirestoreManager.updateUserProfileName(it, newName)
+                                // Kein manuelles Neuladen nötig – Listener bekommt Update automatisch
+                            }
                         }
                     },
                     onBack = { navController.popBackStack() }
@@ -316,6 +395,7 @@ class MainActivity : ComponentActivity() {
 
                 PlayboardScreen(
                     players = playerMoneyList,
+                    avatarMap = avatarMap,
                     currentPlayerId = currentGamePlayerId ?: "",
                     onRollDice = { webSocketClient.sendMessage("Roll") },
                     onBackToLobby = { navController.navigate("lobby") },
@@ -340,6 +420,7 @@ class MainActivity : ComponentActivity() {
                     setIncomingDeal = { currentDealProposal = it },
                     showIncomingDialog = showIncomingDialog,
                     setShowIncomingDialog = { showIncomingDialog = it },
+                    gameEvents = gameEvents,
                     onGiveUp = {
                         localPlayerId?.let {
                             webSocketClient.logic().sendGiveUpMessage(it)

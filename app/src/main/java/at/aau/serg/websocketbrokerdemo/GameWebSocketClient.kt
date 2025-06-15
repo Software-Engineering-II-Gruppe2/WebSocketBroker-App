@@ -14,10 +14,12 @@ import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
+import org.json.JSONObject
 import java.util.Properties
 
 class GameWebSocketClient(
     private val context: Context,
+    private var onPlayerInJail: ((String) -> Unit)? = null,
     private val onConnected: () -> Unit,
     private var onMessageReceived: (String) -> Unit,
     private val onDiceRolled: (playerId: String, value: Int, manual: Boolean, isPasch: Boolean) -> Unit,
@@ -33,7 +35,7 @@ class GameWebSocketClient(
     private val onClearChat: () -> Unit,
     private val onDealProposal: (DealProposalMessage) -> Unit,
     private val onDealResponse: (DealResponseMessage) -> Unit,
-    private val onGiveUpReceived: () -> Unit,
+    private val onGiveUpReceived: (userId: String) -> Unit,
     private val onPlayerSentToJail: (playerName: String) -> Unit
     ) {
 
@@ -74,8 +76,9 @@ class GameWebSocketClient(
         onHasWon = { winnerId -> onHasWon(winnerId) },
         onMessageReceived = { text -> onMessageReceived(text) },
         onDealProposal = { dealProposal -> onDealProposal(dealProposal) },
-        onGiveUpReceived = onGiveUpReceived,
-        onDealResponse = { dealResponse -> onDealResponse(dealResponse) }
+        onGiveUpReceived = { givingUpUserId -> onGiveUpReceived(givingUpUserId) },
+        onDealResponse = { dealResponse -> onDealResponse(dealResponse) },
+        onReset = { logicHandler.sendInitMessage() }
     )
 
     private val serverUrl: String = loadServerUrl(context)
@@ -103,6 +106,16 @@ class GameWebSocketClient(
 
         override fun onMessage(ws: WebSocket, text: String) {
             Log.d("WebSocket", "Received: $text")
+            try {
+                val json = JSONObject(text)
+                if (json.optString("type") == "PLAYER_IN_JAIL") {
+                    val playerId = json.optString("playerId")
+                    onPlayerInJail?.invoke(playerId)
+                    return
+                }
+            } catch (e: Exception) {
+                // ignorieren, wenn kein JSON
+            }
             messageParser.parse(text)
             if (text.contains("goes to jail!", ignoreCase = true)) {
                 val playerName = extractPlayerName(text)
@@ -158,6 +171,10 @@ class GameWebSocketClient(
 
     fun setDealResponseListener(callback: (DealResponseMessage) -> Unit) {
         dealResponseListener = callback
+    }
+
+    fun setPlayerInJailListener(listener: (String) -> Unit) {
+        onPlayerInJail = listener
     }
 
     // Zugriffe auf GameLogicHandler – optional von außen nutzbar

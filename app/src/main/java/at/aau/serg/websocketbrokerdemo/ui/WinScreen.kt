@@ -178,7 +178,7 @@ fun FallingSymbol() {
         )
     )
 
-    val symbols = listOf("💵", "🏠", "🎲", "🏦", "🤑")
+    val symbols = listOf("💵", "🏠", "🎲", "🏦", "🤑", "\uD83D\uDC10")
     val symbol = remember { symbols.random() }
 
     Box(modifier = Modifier.fillMaxSize()) {

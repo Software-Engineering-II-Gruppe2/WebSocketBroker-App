@@ -44,6 +44,7 @@ fun DealDialog(
     senderId: String,
     allProperties: List<Property>,
     receiver: PlayerMoney?,
+    avatarMap: Map<String, Int>,
     initialRequested: List<Int> = emptyList(),
     initialOffered: List<Int> = emptyList(),
     initialMoney: Int = 0,
@@ -93,21 +94,16 @@ fun DealDialog(
                             .horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        val playerImages = listOf(
-                            R.drawable.player_red,
-                            R.drawable.player_blue,
-                            R.drawable.player_green,
-                            R.drawable.player_yellow
-                        )
+                        players.forEach { player ->
+                            val imageRes = avatarMap[player.id] ?: R.drawable.player_red
 
-                        players.forEachIndexed { index, player ->
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(player.name)
 
                                 Spacer(Modifier.height(4.dp))
 
                                 Image(
-                                    painter = painterResource(id = playerImages.getOrElse(index) { playerImages[0] }),
+                                    painter = painterResource(id = imageRes),
                                     contentDescription = "${player.name}'s figure",
                                     modifier = Modifier
                                         .size(64.dp)
