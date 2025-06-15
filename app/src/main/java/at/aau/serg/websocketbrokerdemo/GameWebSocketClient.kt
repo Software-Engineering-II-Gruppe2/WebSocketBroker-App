@@ -33,7 +33,8 @@ class GameWebSocketClient(
     private val onClearChat: () -> Unit,
     private val onDealProposal: (DealProposalMessage) -> Unit,
     private val onDealResponse: (DealResponseMessage) -> Unit,
-    private val onGiveUpReceived: () -> Unit
+    private val onGiveUpReceived: () -> Unit,
+    private val onPlayerSentToJail: (playerName: String) -> Unit
     ) {
 
     private val client = OkHttpClient()
@@ -103,6 +104,10 @@ class GameWebSocketClient(
         override fun onMessage(ws: WebSocket, text: String) {
             Log.d("WebSocket", "Received: $text")
             messageParser.parse(text)
+            if (text.contains("goes to jail!", ignoreCase = true)) {
+                val playerName = extractPlayerName(text)
+                onPlayerSentToJail(playerName)
+            }
         }
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
@@ -164,5 +169,8 @@ class GameWebSocketClient(
             properties.load(input)
         }
         return properties.getProperty("server.url")
+    }
+    private fun extractPlayerName(message: String): String {
+        return message.substringAfter("Player ").substringBefore(" goes to jail").trim()
     }
 }
