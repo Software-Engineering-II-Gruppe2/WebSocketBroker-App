@@ -211,17 +211,16 @@ tasks.withType<Test>().configureEach {
 
 dependencies {
 
+    // --- Main implementation dependencies ---
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.espresso.intents)
-    implementation(libs.androidx.junit.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.test.junit4.android)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.core.ktx)
     implementation(libs.firebase.auth.ktx)
@@ -229,31 +228,36 @@ dependencies {
     implementation(libs.krossbow.websocket.okhttp)
     implementation(libs.krossbow.stomp.core)
     implementation(libs.krossbow.websocket.builtin)
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.gson)
     implementation(libs.coil.compose)
     implementation(libs.play.services.auth)
+    implementation(libs.androidx.ui.test.junit4.android)
+
+    // --- Unit test dependencies ---
+    testImplementation(kotlin("test"))
     testImplementation(libs.junit)
-    testImplementation (libs.junit.jupiter.api)
+    testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.junit.jupiter)
-    testImplementation("org.mockito:mockito-inline:5.2.0")
+    testImplementation(libs.mockito.inline)
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.mockk.v1135)
     testImplementation(libs.mockk.mockk)
+    testRuntimeOnly(libs.junit.jupiter.engine)
 
-    testRuntimeOnly (libs.junit.jupiter.engine)
-
+    // --- Android instrumentation test dependencies ---
+    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.espresso.intents)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.junit.ktx)
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.kotlinx.coroutines.play.services)
     androidTestImplementation(libs.mockito.core)
     androidTestImplementation(libs.mockito.junit.jupiter)
-    androidTestImplementation(libs.kotlinx.coroutines.play.services)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
 
+    // --- Debug dependencies ---
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    testImplementation(kotlin("test"))
 
 }

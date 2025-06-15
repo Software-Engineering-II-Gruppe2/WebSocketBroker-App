@@ -22,6 +22,7 @@ kotlin = "2.0.21"
 kotlinx-coroutines = "1.8.0"
 lifecycleRuntimeKtx = "2.6.1"
 mockito = "5.7.0"
+mockito-inline = "5.2.0"
 mockk = "1.13.5"
 mockkVersion = "1.13.7"
 navigation-compose = "2.5.3"
@@ -68,6 +69,7 @@ mockk-mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
 mockk-v1135 = { module = "io.mockk:mockk", version.ref = "mockk" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-auth-v2100 = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuthVersion" }
+mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito" }
 
 
 [plugins]
