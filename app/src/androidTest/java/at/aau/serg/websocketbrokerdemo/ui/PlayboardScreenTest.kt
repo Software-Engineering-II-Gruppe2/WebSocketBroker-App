@@ -40,8 +40,8 @@ class PlayboardScreenTest {
     @Test
     fun testPlayboardScreenDisplaysPlayers() {
         val players = listOf(
-            PlayerMoney(id = "1", name = "Player 1", money = 1500, position = 0),
-            PlayerMoney(id = "2", name = "Player 2", money = 1500, position = 0)
+            PlayerMoney(id = "1", name = "Player 1", money = 1500, position = 0,false,0, false),
+            PlayerMoney(id = "2", name = "Player 2", money = 1500, position = 0,false,0, false)
         )
 
         composeTestRule.setContent {
@@ -283,7 +283,7 @@ class PlayboardScreenTest {
     @Test
     fun testChatToggleOpensAndClosesChatOverlay() {
         val players = listOf(
-            PlayerMoney(id = "1", name = "Player 1", money = 1500, position = 0)
+            PlayerMoney(id = "1", name = "Player 1", money = 1500, position = 0,false,0, false)
         )
 
         composeTestRule.setContent {
@@ -393,8 +393,8 @@ class PlayboardScreenTest {
     @Test
     fun endTurnButton_shouldBeVisibleOnlyIfMyTurn() {
         val testPlayers = listOf(
-            PlayerMoney("p1", "Alice", 1500, 3),
-            PlayerMoney("p2", "Bob", 1500, 5)
+            PlayerMoney("p1", "Alice", 1500, 3,false,0, false),
+            PlayerMoney("p2", "Bob", 1500, 5,false,0, false)
         )
 
         composeTestRule.setContent {
@@ -449,7 +449,7 @@ class PlayboardScreenTest {
             mortgageValue = 50, image = "some_street", isMortgaged = false, ownerId = null
         )
 
-        val testPlayers = listOf(PlayerMoney("p1", "Alice", 1500, 3))
+        val testPlayers = listOf(PlayerMoney("p1", "Alice", 1500, 3,false,0, false))
 
         composeTestRule.setContent {
             PlayboardScreen(
@@ -505,7 +505,7 @@ class PlayboardScreenTest {
             DummyProperty(id = 23, position = 23, color = PropertyColor.RED).copyWithOwner("p1")
         )
 
-        val testPlayer = PlayerMoney("p1", "Alice", 1500, 0)
+        val testPlayer = PlayerMoney("p1", "Alice", 1500, 0,false,0, false)
         val mockWebSocketClient = mock(GameWebSocketClient::class.java)
 
         composeTestRule.setContent {
@@ -529,7 +529,7 @@ class PlayboardScreenTest {
         )
         val all = owned + DummyProperty(id = 9, position = 9, color = PropertyColor.LIGHT_BLUE)
 
-        val testPlayer = PlayerMoney("p1", "Alice", 1500, 0)
+        val testPlayer = PlayerMoney("p1", "Alice", 1500, 0,false,0, false)
         val mockWebSocketClient = mock(GameWebSocketClient::class.java)
 
         composeTestRule.setContent {
