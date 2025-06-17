@@ -18,17 +18,14 @@ import at.aau.serg.websocketbrokerdemo.data.properties.PropertyViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -41,9 +38,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 
 import androidx.compose.ui.text.font.FontWeight
@@ -60,11 +54,11 @@ import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseType
 import at.aau.serg.websocketbrokerdemo.data.messages.ShakeMessage
-import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
 import at.aau.serg.websocketbrokerdemo.logic.ShakeDetector
 import com.google.gson.Gson
 
 import at.aau.serg.websocketbrokerdemo.ui.components.DiceRollingButton
+import at.aau.serg.websocketbrokerdemo.ui.components.EnableImmersiveMode
 import at.aau.serg.websocketbrokerdemo.ui.components.PlayerCard
 import at.aau.serg.websocketbrokerdemo.ui.components.dialogs.ActionMenuDialog
 import at.aau.serg.websocketbrokerdemo.ui.components.alerts.CardPopup
@@ -120,6 +114,7 @@ fun PlayboardScreen(
     drawnCardDesc: String?,         // the description (fallback) if drawable not found
     onCardDialogDismiss: () -> Unit // called to clear the popup
 ) {
+    EnableImmersiveMode()
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
     val properties = remember {

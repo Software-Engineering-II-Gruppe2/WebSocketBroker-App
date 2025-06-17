@@ -18,7 +18,6 @@ import okhttp3.WebSocketListener
 import okio.ByteString
 import org.json.JSONObject
 import java.util.Properties
-import java.util.concurrent.TimeUnit
 
 class GameWebSocketClient(
 
@@ -45,7 +44,7 @@ class GameWebSocketClient(
    /* private val client = OkHttpClient.Builder()
         .pingInterval(15, TimeUnit.SECONDS)   // alle 15s ein WebSocket‐Ping
         .build()*/
-    private val client= OkHttpClient();
+    private val client= OkHttpClient()
     private var webSocket: WebSocket? = null
     private val gson = Gson()
 
@@ -128,7 +127,7 @@ class GameWebSocketClient(
     private fun createListener() = object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
             Log.d("WebSocket", "Connected to server with response: ${response.message}")
-            onConnected();
+            onConnected()
             logicHandler.sendInitMessage()
         }
 
