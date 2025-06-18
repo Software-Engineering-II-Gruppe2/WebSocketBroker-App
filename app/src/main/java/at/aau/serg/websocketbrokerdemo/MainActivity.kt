@@ -387,7 +387,6 @@ class MainActivity : ComponentActivity() {
                     players = playerMoneyList,
                     avatarMap = avatarMap,
                     currentPlayerId = currentGamePlayerId ?: "",
-                    localPlayerId = currentGamePlayerId ?: "",
                     onRollDice = { webSocketClient.sendMessage("Roll") },
                     onBackToLobby = { navController.navigate("lobby") },
                     diceResult = diceValue,
@@ -398,6 +397,7 @@ class MainActivity : ComponentActivity() {
                     setHasPasch = { hasPasch = it },
                     cheatFlags = cheatFlags,
                     webSocketClient = webSocketClient,
+                    localPlayerId = localPlayerId ?: "",
                     chatMessages = chatMessages,
                     cheatMessages = cheatMessages,
                     showPassedGoAlert = showPassedGoAlert,
@@ -424,9 +424,7 @@ class MainActivity : ComponentActivity() {
                         drawnCardType = null
                         drawnCardId = null
                         drawnCardDesc = null
-                    },
-
-
+                    }
                 )
             }
             composable("leaderboard") {

@@ -32,33 +32,22 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.text.TextStyle
-
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-
-import at.aau.serg.websocketbrokerdemo.ui.components.TurnTimer
-
-import androidx.compose.ui.zIndex
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
+import androidx.compose.ui.text.input.KeyboardType
 import at.aau.serg.websocketbrokerdemo.data.CheatEntry
-
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseType
-import at.aau.serg.websocketbrokerdemo.data.messages.ShakeMessage
-import at.aau.serg.websocketbrokerdemo.logic.ShakeDetector
 import com.google.gson.Gson
-
+import at.aau.serg.websocketbrokerdemo.logic.ShakeDetector
+import at.aau.serg.websocketbrokerdemo.data.messages.ShakeMessage
 import at.aau.serg.websocketbrokerdemo.ui.components.DiceRollingButton
-import at.aau.serg.websocketbrokerdemo.ui.components.EnableImmersiveMode
 import at.aau.serg.websocketbrokerdemo.ui.components.PlayerCard
 import at.aau.serg.websocketbrokerdemo.ui.components.dialogs.ActionMenuDialog
 import at.aau.serg.websocketbrokerdemo.ui.components.alerts.CardPopup
@@ -114,7 +103,6 @@ fun PlayboardScreen(
     drawnCardDesc: String?,         // the description (fallback) if drawable not found
     onCardDialogDismiss: () -> Unit // called to clear the popup
 ) {
-    EnableImmersiveMode()
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
     val properties = remember {
@@ -124,14 +112,7 @@ fun PlayboardScreen(
             )
         }
     }
-
-    val turnId = webSocketClient.currentTurnId.collectAsState().value
-    val turnPlayer = players.firstOrNull { it.id == turnId }
-    val isMyTurnEvenIfBot = turnId == localPlayerId
-    val isBotTurn = turnPlayer?.bot == true
-    val isMyTurn = isMyTurnEvenIfBot && !isBotTurn
-
-
+    val isMyTurn = currentPlayerId == localPlayerId
     var turnEnded by remember { mutableStateOf(false) }
     var selectedProperty by remember { mutableStateOf<Property?>(null) }
     var canBuy by remember { mutableStateOf(false) }
@@ -143,8 +124,6 @@ fun PlayboardScreen(
     var chatInput by remember { mutableStateOf("") }
     var cheatInput by remember { mutableStateOf("") }
     var rentPaid by remember { mutableStateOf(false) }
-    val amInJail = players.find { it.id == localPlayerId }?.inJail ?: false
-    var timeLeft by remember { mutableStateOf<Int?>(null) }
     val nameColors = listOf(
         Color(0xFFE57373), // Rot
         Color(0xFF64B5F6), // Blau
@@ -167,7 +146,7 @@ fun PlayboardScreen(
 
     // ShakeDetector:
     ShakeDetector(shakingThreshold = 15f) {
-        val shakeMsg = ShakeMessage(playerId = localPlayerId)
+        val shakeMsg = ShakeMessage(playerId = currentPlayerId)
         val json = Gson().toJson(shakeMsg)
         webSocketClient.sendMessage(json)
     }
@@ -240,8 +219,7 @@ fun PlayboardScreen(
                 }
                 selectedProperty = landedProperty
                 openedByClick = false
-                val isDicePlayerHuman = dicePlayerId == localPlayerId && !isBotTurn
-                canBuy = isDicePlayerHuman && landedProperty.ownerId == null
+                canBuy = true
             }
         }
     }
@@ -282,9 +260,7 @@ fun PlayboardScreen(
                     val currentPlayer = players.find { it.id == dicePlayerId }
                     selectedProperty = properties.find { it.position == tilePos }
                     openedByClick = true
-                    canBuy = isMyTurn &&
-                            (currentPlayer?.position == tilePos) &&
-                            (selectedProperty?.ownerId == null)
+                    canBuy = currentPlayer?.position == tilePos
                 },
                 cheatFlags = cheatFlags,
                 players = players,
@@ -302,7 +278,7 @@ fun PlayboardScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val diceEnabled = isMyTurn && !amInJail && (!hasRolled || hasPasch)
+            val diceEnabled = isMyTurn && (!hasRolled || hasPasch)
             DiceRollingButton(
                 text = "Roll Dice",
                 color = if (diceEnabled) Color(0xFF3FAF3F) else Color.Gray,
@@ -371,7 +347,7 @@ fun PlayboardScreen(
                             player = player,
                             ownedProperties = properties.filter { it.ownerId == player.id },
                             allProperties = properties,
-                            isCurrentPlayer = (player.id == turnId),
+                            isCurrentPlayer = player.id == localPlayerId,
                             playerIndex = players.indexOf(player),
                             onPropertySetClicked = { colorSet ->
                                 println("Clicked on color set: $colorSet")
@@ -384,20 +360,13 @@ fun PlayboardScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-
-            val endTurnEnabled = isMyTurn && !turnEnded && (hasRolled || amInJail)
-
-            if (isMyTurn) {
+            if (isMyTurn && !turnEnded) {
                 Button(
                     onClick = {
                         webSocketClient.sendMessage("NEXT_TURN")
                         turnEnded = true
                     },
-                    enabled = endTurnEnabled,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (endTurnEnabled) Color(0xFF0074cc)
-                        else Color.Gray      // deaktiviert
-                    ),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp)
@@ -420,26 +389,12 @@ fun PlayboardScreen(
         }
 
         // Reset wenn neuer Zug
-        LaunchedEffect(turnId) {
-            if (isMyTurn) {
+        LaunchedEffect(currentPlayerId == localPlayerId) {
+            if (currentPlayerId == localPlayerId) {
                 turnEnded = false
                 setHasRolled(false)
                 setHasPasch(false)
                 rentPaid = false
-            }
-        }
-
-        // Timer
-        LaunchedEffect(turnId) {
-            // nur starten, wenn jemand dran ist, der kein Bot ist
-            if (turnId != null && !players.first { it.id == turnId }.bot) {
-                timeLeft = 30
-                while (timeLeft!! > 0) {
-                    delay(1_000)
-                    timeLeft = timeLeft!! - 1
-                }
-            } else {
-                timeLeft = null                     // Bots brauchen keinen Timer
             }
         }
 
@@ -480,54 +435,20 @@ fun PlayboardScreen(
                     canBuy = false
                 }
             )
+        }
 
-            // Passed GO Alert
-            if (showPassedGoAlert) {
-                PassedGoAlertBox(playerName = passedGoPlayerName)
-            }
+        // Passed GO Alert
+        if (showPassedGoAlert) {
+            PassedGoAlertBox(playerName = passedGoPlayerName)
+        }
 
-            // Tax Payment Alert
-            if (showTaxPaymentAlert) {
-                TaxPaymentAlertBox(
-                    playerName = taxPaymentPlayerName,
-                    amount = taxPaymentAmount,
-                    taxType = taxPaymentType
-                )
-            }
-            // Tax Payment Alert
-            if (showTaxPaymentAlert) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.3f)
-                        .background(Color(0xFFFFA500).copy(alpha = 0.9f))
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Autsch!",
-                            style = TextStyle(
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "$taxPaymentPlayerName muss ${taxPaymentAmount}€ $taxPaymentType an die Bank zahlen!",
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                color = Color.White
-                            )
-                        )
-                    }
-                }
-            }
-
+        // Tax Payment Alert
+        if (showTaxPaymentAlert) {
+            TaxPaymentAlertBox(
+                playerName = taxPaymentPlayerName,
+                amount = taxPaymentAmount,
+                taxType = taxPaymentType
+            )
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -704,17 +625,6 @@ fun PlayboardScreen(
                 cardDesc = drawnCardDesc,
                 onDismiss = onCardDialogDismiss
             )
-        }
-
-        timeLeft?.let { secs ->
-            TurnTimer(
-                seconds = secs,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)   // zentriert oben
-                    .padding(top = 6.dp)
-                    .zIndex(3f)                   // höher als alles andere
-            )
-
         }
     }
 }

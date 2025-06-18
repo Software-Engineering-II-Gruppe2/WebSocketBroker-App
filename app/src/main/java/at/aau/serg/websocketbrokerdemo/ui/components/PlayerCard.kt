@@ -26,24 +26,14 @@ fun PlayerCard(
     onPropertySetClicked: (PropertyColor) -> Unit,
     webSocketClient: GameWebSocketClient
 ) {
-
-
     val playerColors = listOf(
-        Color(0x80FF0000),
-        Color(0x800000FF),
-        Color(0x8000FF00),
-        Color(0x80FFFF00)
+        Color(0x80FF0000), // Less saturated Red
+        Color(0x800000FF), // Less saturated Blue
+        Color(0x8000FF00), // Less saturated Green
+        Color(0x80FFFF00)  // Less saturated Yellow
     )
 
-
-    val backgroundColor = if (player.bot) {
-        Color(0xFFB0BEC5)          // Light Grey
-    } else {
-        playerColors[playerIndex].copy(alpha = 0.4f)
-    }
-
-    val displayName = if (player.bot) "${player.name} 🤖" else player.name
-
+    val backgroundColor = playerColors[playerIndex].copy(alpha = 0.4f)
 
     var selectedColorSet by remember { mutableStateOf<PropertyColor?>(null) }
 
@@ -53,11 +43,15 @@ fun PlayerCard(
             .wrapContentHeight()
             .then(
                 if (isCurrentPlayer) {
-                    Modifier.border(4.dp, Color.Black, RoundedCornerShape(8.dp))
+                    Modifier.border(
+                        width = 4.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(8.dp)
+                    )
                 } else Modifier
             ),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
-        shape  = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(8.dp)
     ) {
         Column(
             modifier = Modifier
@@ -66,41 +60,57 @@ fun PlayerCard(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            /* Kopfzeile: Name, Geld, Position */
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(displayName,      color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Text("EUR ${player.money}", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                Text("Pos: ${player.position}", color = Color.White, fontSize = 12.sp)
+                Text(
+                    text = player.name,
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "EUR ${player.money}",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Pos: ${player.position}",
+                    color = Color.White,
+                    fontSize = 12.sp
+                )
             }
 
-
-            Text("ID: ${player.id}", color = Color.White, fontSize = 6.sp)
+            Text(
+                text = "ID: ${player.id}",
+                color = Color.White,
+                fontSize = 6.sp
+            )
 
             HorizontalDivider(
-                modifier   = Modifier.padding(vertical = 4.dp),
-                thickness  = 1.dp,
-                color      = Color.White
+                modifier = Modifier.padding(vertical = 4.dp),
+                thickness = 1.dp,
+                color = Color.White
             )
-
 
             BesitzkartenGrid(
-                ownedProperties   = ownedProperties,
-                allProperties     = allProperties,
-                onPropertySetClicked = { selectedColorSet = it }
+                ownedProperties = ownedProperties,
+                allProperties = allProperties,
+                onPropertySetClicked = { colorSet -> selectedColorSet = colorSet }
             )
 
-
-            selectedColorSet?.let { colorSet ->
+            if (selectedColorSet != null) {
                 PropertySetPopup(
-                    colorSet        = colorSet,
-                    ownedProperties = ownedProperties.filter { getColorForPosition(it.position) == colorSet },
-                    allProperties   = allProperties.filter { getColorForPosition(it.position) == colorSet },
-                    onDismiss       = { selectedColorSet = null },
-                    onSellProperty  = { propertyId -> webSocketClient.logic().sellProperty(propertyId) }
+                    colorSet = selectedColorSet!!,
+                    ownedProperties = ownedProperties.filter { getColorForPosition(it.position) == selectedColorSet },
+                    allProperties = allProperties.filter { getColorForPosition(it.position) == selectedColorSet },
+                    onDismiss = { selectedColorSet = null },
+                    onSellProperty = { propertyId ->
+                        webSocketClient.logic().sellProperty(propertyId)
+                    }
                 )
             }
         }

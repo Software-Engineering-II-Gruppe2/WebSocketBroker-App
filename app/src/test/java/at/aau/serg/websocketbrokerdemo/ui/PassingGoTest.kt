@@ -47,7 +47,7 @@ class PassingGoTest {
 
     @Test
     fun testPassingGoAlertShowsCorrectly() {
-        val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0,false,0, false)
+        val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0)
         val players = listOf(testPlayer)
 
         composeTestRule.setContent {
@@ -95,7 +95,7 @@ class PassingGoTest {
     @Test
     fun testPassingGoAlertDisappearsAfterDelay() = runTest {
         var showAlert = true
-        val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0,false,0, false)
+        val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0)
         val players = listOf(testPlayer)
 
         composeTestRule.setContent {
@@ -184,7 +184,7 @@ class PassingGoTest {
 
     @Test
     fun testPropertyCardShowsAfterGoAlert() = runTest {
-        val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0,false,0, false)
+        val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0)
         val players = listOf(testPlayer)
 
         composeTestRule.setContent {
@@ -237,7 +237,7 @@ class PassingGoTest {
     @Test
     fun testMoneyUpdateAfterPassingGo() {
         val initialMoney = 1500
-        val testPlayer = PlayerMoney("test-id", "Test Player", initialMoney, 0,false,0, false)
+        val testPlayer = PlayerMoney("test-id", "Test Player", initialMoney, 0)
         val players = listOf(testPlayer)
 
         composeTestRule.setContent {

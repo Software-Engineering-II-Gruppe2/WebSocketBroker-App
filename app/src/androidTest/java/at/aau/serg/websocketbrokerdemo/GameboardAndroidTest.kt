@@ -64,8 +64,8 @@ class GameboardAndroidTest {
     @Test
     fun testPlayerImagesAreDisplayedOnCorrectTile() {
         val players = listOf(
-            PlayerMoney(id = "1", name = "Player A", money = 1500, position = 0, false,0, false),
-            PlayerMoney(id = "2", name = "Player B", money = 1500, position = 0,false,0, false)
+            PlayerMoney(id = "1", name = "Player A", money = 1500, position = 0),
+            PlayerMoney(id = "2", name = "Player B", money = 1500, position = 0)
         )
 
         composeTestRule.setContent {
@@ -86,7 +86,7 @@ class GameboardAndroidTest {
     @Ignore
     fun testFallbackAlignmentForMoreThanFourPlayers() {
         val players = (1..5).map {
-            PlayerMoney(id = it.toString(), name = "P$it", money = 1500, position = 0,false,0, false)
+            PlayerMoney(id = it.toString(), name = "P$it", money = 1500, position = 0)
         }
 
         composeTestRule.setContent {
@@ -151,7 +151,7 @@ class GameboardAndroidTest {
     @Test
     fun testAllPlayersVisibleOnSameTile() {
         val players = (1..4).map {
-            PlayerMoney(id = it.toString(), name = "Player $it", money = 1500, position = 0,false,0, false)
+            PlayerMoney(id = it.toString(), name = "Player $it", money = 1500, position = 0)
         }
 
         composeTestRule.setContent {
@@ -171,8 +171,8 @@ class GameboardAndroidTest {
     @Test
     fun testCheatFlagSwitchesContentDescription() {
         val players = listOf(
-            PlayerMoney(id = "1", name = "Alice", money = 1500, position = 0,false,0, false),
-            PlayerMoney(id = "2", name = "Bob",   money = 1500, position = 0,false,0, false)
+            PlayerMoney(id = "1", name = "Alice", money = 1500, position = 0),
+            PlayerMoney(id = "2", name = "Bob",   money = 1500, position = 0)
         )
         val cheatFlags = mapOf("1" to true, "2" to false)
 
@@ -196,8 +196,8 @@ class GameboardAndroidTest {
     @Test
     fun testOffsetOnlyAppliedWhenMultiplePlayers() {
         // two dummy players, same tile
-        val p1 = PlayerMoney(id = "1", name = "Solo", money = 1500, position = 0,false,0, false)
-        val p2 = PlayerMoney(id = "2", name = "Duo",  money = 1500, position = 0,false,0, false)
+        val p1 = PlayerMoney(id = "1", name = "Solo", money = 1500, position = 0)
+        val p2 = PlayerMoney(id = "2", name = "Duo",  money = 1500, position = 0)
 
         lateinit var playersState: androidx.compose.runtime.MutableState<List<PlayerMoney>>
 

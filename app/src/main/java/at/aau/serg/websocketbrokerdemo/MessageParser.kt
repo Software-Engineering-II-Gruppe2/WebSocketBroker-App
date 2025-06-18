@@ -35,7 +35,7 @@ class MessageParser(
     private val onDealProposal: (DealProposalMessage) -> Unit,
     private val onDealResponse: (DealResponseMessage) -> Unit,
     private val onReset: () -> Unit
-    ) {
+) {
     fun parse(text: String) {
         // 1) TAX_PAYMENT:
         if(parseTaxPayment(text)) return

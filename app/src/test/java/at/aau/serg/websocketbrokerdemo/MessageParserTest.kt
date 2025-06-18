@@ -13,8 +13,8 @@ class MessageParserTest {
     private lateinit var gson: Gson
 
     private val dummyPlayers = listOf(
-        PlayerMoney(id = "p1", name = "Alice", money = 0, position = 0,false,0, false),
-        PlayerMoney(id = "p2", name = "Bob",   money = 0, position = 1,false,0, false)
+        PlayerMoney(id = "p1", name = "Alice", money = 0, position = 0),
+        PlayerMoney(id = "p2", name = "Bob",   money = 0, position = 1)
     )
 
     @BeforeEach

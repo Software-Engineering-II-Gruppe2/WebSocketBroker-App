@@ -8,8 +8,6 @@ import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import at.aau.serg.websocketbrokerdemo.logic.GameLogicHandler
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -20,7 +18,6 @@ import org.json.JSONObject
 import java.util.Properties
 
 class GameWebSocketClient(
-
     private val context: Context,
     private var onPlayerInJail: ((String) -> Unit)? = null,
     private val onConnected: () -> Unit,
@@ -41,23 +38,13 @@ class GameWebSocketClient(
     private val onGiveUpReceived: (userId: String) -> Unit
     ) {
 
-   /* private val client = OkHttpClient.Builder()
-        .pingInterval(15, TimeUnit.SECONDS)   // alle 15s ein WebSocket‐Ping
-        .build()*/
-    private val client= OkHttpClient()
+    private val client = OkHttpClient()
     private var webSocket: WebSocket? = null
     private val gson = Gson()
 
     private var players: List<PlayerMoney> = emptyList()
     private var onPlayerTurnListener: ((String) -> Unit)? = null
     private var propertyBoughtListener: ((String) -> Unit)? = null
-    //  wer ist gerade dran?
-    private val _currentTurnId = MutableStateFlow<String?>(null)
-    val    currentTurnId: StateFlow<String?> = _currentTurnId
-
-    private val myPlayerId: String =
-        com.google.firebase.auth.FirebaseAuth.getInstance().currentUser!!.uid
-
 
     private val logicHandler = GameLogicHandler(
         context = context,
@@ -77,21 +64,10 @@ class GameWebSocketClient(
             onGameStateReceived(state)
         },
         onPlayerTurn = { sessionId ->
-            _currentTurnId.value = sessionId      // wer ist dran?
             onPlayerTurn(sessionId)
             onPlayerTurnListener?.invoke(sessionId)
-
-            if (sessionId == myPlayerId) {
-                Log.d("WebSocket", "It's now YOUR turn; session ID = $sessionId")
-            } else {
-                Log.d("WebSocket", "Opponent’s turn: $sessionId")
-            }
         },
-        onDiceRolled = { pid, value, manual, isPasch ->
-            _lastRoll.value = value      // <-- auch Bot-Würfe!
-            _rollerId.value = pid
-            onDiceRolled(pid, value, manual, isPasch)     // dein bisheriger Callback
-        },
+        onDiceRolled = { pid, v, manual, isPasch -> onDiceRolled(pid, v, manual, isPasch) },
         onCardDrawn = { pid, type, desc, cardId -> onCardDrawn(pid, type, desc, cardId) },
         onChatMessageReceived = { pid, msg -> onChatMessageReceived(pid, msg) },
         onCheatMessageReceived = { pid, msg -> onCheatMessageReceived(pid, msg) },
@@ -103,11 +79,7 @@ class GameWebSocketClient(
         onDealResponse = { dealResponse -> onDealResponse(dealResponse) },
         onReset = { logicHandler.sendInitMessage() }
     )
-    private val _lastRoll  = MutableStateFlow<Int?>(null)
-    private val _rollerId  = MutableStateFlow<String?>(null)
 
-    val lastRoll : StateFlow<Int?>    = _lastRoll
-    val rollerId : StateFlow<String?> = _rollerId
     private val serverUrl: String = loadServerUrl(context)
     private val request: Request = Request.Builder().url(serverUrl).build()
 
@@ -127,7 +99,7 @@ class GameWebSocketClient(
     private fun createListener() = object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
             Log.d("WebSocket", "Connected to server with response: ${response.message}")
-            onConnected()
+            onConnected();
             logicHandler.sendInitMessage()
         }
 
