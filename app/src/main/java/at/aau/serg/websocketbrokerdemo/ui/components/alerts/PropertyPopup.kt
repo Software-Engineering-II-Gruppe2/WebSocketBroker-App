@@ -27,7 +27,6 @@ fun PropertyPopup(
     selectedProperty: Property,
     canBuy: Boolean,
     isMyTurn: Boolean,
-    openedByClick: Boolean,
     localPlayerId: String,
     gameEvents: SnapshotStateList<String>,
     webSocketClient: GameWebSocketClient,
